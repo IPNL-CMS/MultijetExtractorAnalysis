@@ -95,6 +95,7 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
     process.PATextraction.jet_PF.jetCorrectorLabel = "ak5PFchsL1FastL2L3Residual"
 
   process.PATextraction.jet_PF.doJER = True # Disable automatically on data
+  process.PATextraction.jet_PF.doLooseJetID = False 
 
   # JER systematics:
   # Use -1 for 1-sigma down, 0 for nominal correction, and 1 for 1-sigma up
