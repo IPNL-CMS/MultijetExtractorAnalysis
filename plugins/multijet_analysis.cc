@@ -16,13 +16,13 @@ float computeDeltaPhi(float phi1, float phi2) {
 multijet_analysis::multijet_analysis(const edm::ParameterSet& cmsswSettings): Plugin(cmsswSettings)
 {
   // Initialize the analysis parameters using the ParameterSet cmsswSettings
-  int an_option = cmsswSettings.getUntrackedParameter<int>("an_option", 0);
   
  
    // Set everything to 0
   m_met_lorentzvector = new TClonesArray("TLorentzVector");
   m_recoil_lorentzvector = new TClonesArray("TLorentzVector");
   m_leadingjet_lorentzvector = new TClonesArray("TLorentzVector");
+  m_leadingjetgen_lorentzvector = new TClonesArray("TLorentzVector");
   m_jets_recoil_lorentzvector = new TClonesArray("TLorentzVector");
   
   //reset();
@@ -73,6 +73,7 @@ multijet_analysis::multijet_analysis(const edm::ParameterSet& cmsswSettings): Pl
   //m_tree_Multijet->Branch("MET", &m_met, "MET/F");
   m_tree_Multijet->Branch("met_4vector","TClonesArray",&m_met_lorentzvector, 1000, 0);
   m_tree_Multijet->Branch("leadingjet_4vector","TClonesArray",&m_leadingjet_lorentzvector, 5000, 0);
+  m_tree_Multijet->Branch("leadingjetgen_4vector","TClonesArray",&m_leadingjetgen_lorentzvector, 5000, 0);
   m_tree_Multijet->Branch("recoil_4vector","TClonesArray",&m_recoil_lorentzvector, 5000, 0);
   m_tree_Multijet->Branch("n_jets_recoil"         , &m_n_jets_recoil            
   , "n_jets_recoil/I");
@@ -796,6 +797,7 @@ void multijet_analysis::analyze(const edm::EventSetup& iSetup, PatExtractor& ext
 	m_multijet_isSel = 1;
 	
 	new((*m_leadingjet_lorentzvector)[0]) TLorentzVector(*(m_jetMet->getP4(0)));
+	new((*m_leadingjetgen_lorentzvector)[0]) TLorentzVector(*(m_jetMet->getGenP4(0)));
 	
 	m_n_jets_recoil = 0;
 	for (int i = 1; i < m_n_jets; i++)
@@ -883,6 +885,9 @@ void multijet_analysis::reset()
   
   if (m_leadingjet_lorentzvector)
     m_leadingjet_lorentzvector->Clear();
+    
+  if (m_leadingjetgen_lorentzvector)
+    m_leadingjetgen_lorentzvector->Clear();
     
   if (m_recoil_lorentzvector)
     m_recoil_lorentzvector->Clear();
