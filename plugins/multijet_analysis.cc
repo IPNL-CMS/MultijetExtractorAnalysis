@@ -1,4 +1,4 @@
-#include <Extractors/PatExtractor/plugins/multijet_analysis.h>
+#include <Extractors/MultijetExtractorAnalysis/plugins/multijet_analysis.h>
 
 
 using namespace std;
@@ -44,6 +44,11 @@ multijet_analysis::multijet_analysis(const edm::ParameterSet& cmsswSettings): Pl
   m_tree_Multijet->Branch("muon_isHighPtMuon",  &m_muon_isHighPtMuon,    "muon_isHighPtMuon[n_muons]/I");   
   m_tree_Multijet->Branch("muon_isIsolatedMuon",  &m_muon_isIsolatedMuon,   "muon_isIsolatedMuon[n_muons]/I");  
 
+  m_tree_Multijet->Branch("n_photons"         , &m_n_photons             , "n_photons/I");
+  m_tree_Multijet->Branch("photon_isLoosePhoton",  &m_photon_isLoosePhoton,   "photon_isLoosePhoton[n_photons]/I"); 
+  m_tree_Multijet->Branch("photon_isMediumPhoton",  &m_photon_isMediumPhoton,   "photon_isMediumPhoton[n_photons]/I");  
+  m_tree_Multijet->Branch("photon_isTightPhoton",  &m_photon_isTightPhoton,   "photon_isTightPhoton[n_photons]/I");   
+
 //   m_tree_Multijet->Branch("n_electrons"         , &m_n_electrons             , "n_electrons/I");
 //   m_tree_Multijet->Branch("electron_isGoodElectron",  &m_electron_isGoodElectron,   "electron_isGoodElectron[n_electrons]/I");  
 //   m_tree_Multijet->Branch("electron_isIsolatedElectron",  &m_electron_isIsolatedElectron,  
@@ -55,12 +60,11 @@ multijet_analysis::multijet_analysis(const edm::ParameterSet& cmsswSettings): Pl
   
 // cuts
   m_tree_Multijet->Branch("pass_electron_cut", &m_pass_electron_cut, "pass_electron_cut/I");
+  m_tree_Multijet->Branch("pass_vertex_cut", &m_pass_vertex_cut, "pass_vertex_cut/I");
   m_tree_Multijet->Branch("pass_Jet_cut1", &m_pass_Jet_cut1, "pass_Jet_cut1/I");
   m_tree_Multijet->Branch("pass_Jet_cut2", &m_pass_Jet_cut2, "pass_Jet_cut2/I");
   m_tree_Multijet->Branch("pass_1stJet_cut", &m_pass_1stJet_cut, "pass_1stJet_cut/I");
   m_tree_Multijet->Branch("pass_2ndJet_cut", &m_pass_2ndJet_cut, "pass_2ndJet_cut/I");
-  m_tree_Multijet->Branch("pass_photon_cut", &m_pass_photon_cut, "pass_photon_cut/I");
-  m_tree_Multijet->Branch("pass_vertex_cut", &m_pass_vertex_cut, "pass_vertex_cut/I");
   m_tree_Multijet->Branch("pass_alpha_cut", &m_pass_alpha_cut, "pass_alpha_cut/I");
   m_tree_Multijet->Branch("pass_beta_cut", &m_pass_beta_cut, "pass_beta_cut/I");
   
@@ -248,6 +252,83 @@ int multijet_analysis::isIsolatedMuon(int index)
 	return isIsolated;
 }
 
+int multijet_analysis::isLoosePhoton(int index) 
+{
+	int isLoose = 0;
+	if(m_photon->getHadTowOverEm(index) >= 0.05)
+	  return isLoose;
+	  
+	if(m_photon->getSigmaIetaIeta(index) >= 0.0012)
+	  return isLoose;
+	  
+	if(m_photon->hasMatchedPromptElectron(index))
+	  return isLoose;
+	  
+	 if(m_photon->getChargedHadronsIsolation(index) >= 2.6)
+	  return isLoose;
+	  
+	if(m_photon->getNeutralHadronsIsolation(index) >= (3.5 + 0.04 * m_photon->getP4(index)->Pt()))
+	  return isLoose;
+	  
+	if(m_photon->getPhotonIsolation(index) >= (1.3 + 0.005 * m_photon->getP4(index)->Pt()))
+	  return isLoose;
+	  
+	isLoose = 1;
+
+	return isLoose;
+}
+
+int multijet_analysis::isMediumPhoton(int index) 
+{
+	int isMedium = 0;
+	if(m_photon->getHadTowOverEm(index) >= 0.05)
+	  return isMedium;
+	  
+	if(m_photon->getSigmaIetaIeta(index) >= 0.0011)
+	  return isMedium;
+	  
+	if(m_photon->hasMatchedPromptElectron(index))
+	  return isMedium;
+	  
+	 if(m_photon->getChargedHadronsIsolation(index) >= 1.5)
+	  return isMedium;
+	  
+	if(m_photon->getNeutralHadronsIsolation(index) >= (1.0 + 0.04 * m_photon->getP4(index)->Pt()))
+	  return isMedium;
+	  
+	if(m_photon->getPhotonIsolation(index) >= (0.7 + 0.005 * m_photon->getP4(index)->Pt()))
+	  return isMedium;
+	  
+	 isMedium = 1;
+
+	return isMedium;
+}
+
+int multijet_analysis::isTightPhoton(int index) 
+{
+	int isTight = 0;
+	if(m_photon->getHadTowOverEm(index) >= 0.05)
+	  return isTight;
+	  
+	if(m_photon->getSigmaIetaIeta(index) >= 0.0011)
+	  return isTight;
+	  
+	if(m_photon->hasMatchedPromptElectron(index))
+	  return isTight;
+	  
+	 if(m_photon->getChargedHadronsIsolation(index) >= 0.7)
+	  return isTight;
+	  
+	if(m_photon->getNeutralHadronsIsolation(index) >= (0.4 + 0.04 * m_photon->getP4(index)->Pt()))
+	  return isTight;
+	  
+	if(m_photon->getPhotonIsolation(index) >= (0.5 + 0.005 * m_photon->getP4(index)->Pt()))
+	  return isTight;
+	  
+	 isTight = 1;
+
+	return isTight;
+}
 
 int multijet_analysis::ElectronSel()
 {
@@ -269,23 +350,6 @@ int multijet_analysis::ElectronSel()
 	if(n_isol_ele == 0) pass_ele_sel = 1;
 	else if(n_isol_ele >= 1) pass_ele_sel = 0;
 	return pass_ele_sel;
-}
-
-int multijet_analysis::PhotonSel()
-{
-	int n_pho = m_photon->getSize();
-
-	if (!n_pho)
-		return 1;
-
-	for (int i = 0; i < n_pho; i++)
-	{
-		//for the moment, no isolation info stored on patExtractor Tree
-		//to do
-		//if(m_photon->getRhoCorrectedRelativeIsolation(i) < m_PHOT_Iso_max) 
-			//return 0;	
-	}
-	return 1;
 }
 
 
@@ -398,7 +462,7 @@ int multijet_analysis::CountJetsPuLoose()
 	if(n_jet != 0) {	
 		for (int i = 0; i < n_jet; i++)
 		{
-			if(m_jetMet->getJetPuJetId(i) == 1) 
+			if(m_jetMet->getPuJetId(i) == 1) 
 			{
 				n_jet_puLoose = n_jet_puLoose + 1;
 			}		
@@ -655,31 +719,35 @@ void multijet_analysis::analyze(const edm::EventSetup& iSetup, PatExtractor& ext
 	m_n_jets_pt30 = CountJetsPt30();
 	m_n_muons = m_muon->getSize();
 	m_n_goodJets = getNgoodJets() ;
+	m_n_photons = m_photon->getSize();
 	
 	if(m_n_jets != 0) {
-		for(int i=0; i<m_n_jets; i++) {
-			m_jet_isPFJetLoose[i] =  m_jetMet->getJetisPFJetLoose(i);
-			m_jet_puJetId[i]      =  m_jetMet->getJetPuJetId(i);
-		}
+	  for(int i=0; i<m_n_jets; i++) {
+	    m_jet_isPFJetLoose[i] =  m_jetMet->isPFJetLoose(i);
+	    m_jet_puJetId[i]      =  m_jetMet->getPuJetId(i);
+	  }
 	}
 	
 	if(m_n_muons != 0) {
-		for(int i=0; i<m_n_muons; i++) {
-			m_muon_isLooseMuon[i] = isLooseMuon(i);
-			m_muon_isSoftMuon[i] = isSoftMuon(i);	
-			m_muon_isTightMuon[i] = isTightMuon(i);
-			m_muon_isHighPtMuon[i] = isHighPtMuon(i);
-			m_muon_isIsolatedMuon[i] = isIsolatedMuon(i);
-		}
+	  for(int i=0; i<m_n_muons; i++) {
+	    m_muon_isLooseMuon[i] = isLooseMuon(i);
+	    m_muon_isSoftMuon[i] = isSoftMuon(i);	
+	    m_muon_isTightMuon[i] = isTightMuon(i);
+	    m_muon_isHighPtMuon[i] = isHighPtMuon(i);
+	    m_muon_isIsolatedMuon[i] = isIsolatedMuon(i);
+	  }
 	}
 
-
+	if(m_n_photons != 0) {
+	  for(int i=0; i<m_n_photons; i++) {
+	    m_photon_isLoosePhoton[i] = isLoosePhoton(i);
+	    m_photon_isMediumPhoton[i] = isMediumPhoton(i);	
+	    m_photon_isTightPhoton[i] = isTightPhoton(i);
+	  }
+	}
 	
 	int res = ElectronSel();
 	CHECK_RES_AND_RETURN(res, m_pass_electron_cut);
-
-	res = PhotonSel();
-	CHECK_RES_AND_RETURN(res, m_pass_photon_cut);
 
 	res = VertexSel();
 	CHECK_RES_AND_RETURN(res, m_pass_vertex_cut);
@@ -777,6 +845,13 @@ void multijet_analysis::reset()
     m_muon_isHighPtMuon[i]   = -1;
     m_muon_isIsolatedMuon[i] = -1;
   }
+  
+  for (int i=0;i<m_photons_MAX;++i) 
+  {
+    m_photon_isLoosePhoton[i]    = -1;
+    m_photon_isMediumPhoton[i]   = -1;	
+    m_photon_isTightPhoton[i]    = -1;
+  }
     
   m_secondjetpt = -99999.;
   m_A = -1;
@@ -800,9 +875,7 @@ void multijet_analysis::reset()
   m_pass_Jet_cut2         	 = -1;
   m_pass_1stJet_cut      	 = -1;
   m_pass_2ndJet_cut      	 = -1;
-  m_pass_photon_cut      	 = -1;
   m_pass_vertex_cut      	 = -1;
-  m_pass_photon_cut         	 = -1;
   m_pass_alpha_cut       	 = -1;
   m_pass_beta_cut        	 = -1;
  
