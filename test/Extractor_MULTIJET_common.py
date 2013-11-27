@@ -112,8 +112,6 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
   # Multijet analysis configuration
   process.PATextraction.plugins = cms.PSet(
     multijet_analysis = cms.PSet(
-      an_option = cms.untracked.int32(42),
-      
       firstJet = cms.PSet(
 	pt_min = cms.double(240),
 	eta_max = cms.double(1.3)
