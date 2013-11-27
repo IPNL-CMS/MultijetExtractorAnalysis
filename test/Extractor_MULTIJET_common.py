@@ -86,9 +86,6 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
     else:
       process.PATextraction.triggersXML = readFile("triggers_e.xml")
 
-  process.PATextraction.doMtt      = True
-  process.PATextraction.doMultijet = True
-
   # Jets correction : needs a valid global tags, or an external DB where JEC are stored
   process.PATextraction.jet_PF.redoJetCorrection = True
 
@@ -111,12 +108,6 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
   process.PATextraction.MET_PF.redoMetPhiCorrection   = True
   process.PATextraction.MET_PF.redoMetTypeICorrection = False # Automatically true if redoJetCorrection is True
 
-  from Extractor_MTT_ScaleFactors import loadMuonScaleFactor, loadBTagScaleFactors, loadElectronScaleFactor
-  loadBTagScaleFactors(process)
-
-  # Scale factors
-  process.PATextraction.muon_scale_factors = loadMuonScaleFactor("Muon_ID_iso_Efficiencies_Run_2012ABCD_53X.pkl")
-  process.PATextraction.electron_scale_factors = loadElectronScaleFactor("Electron_scale_factors.json")
 
   # Multijet analysis configuration
   process.PATextraction.plugins = cms.PSet(
