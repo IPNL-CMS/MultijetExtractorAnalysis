@@ -69,6 +69,7 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
   process.PATextraction.doMuon     = True
   process.PATextraction.doElectron = True
   process.PATextraction.doJet      = True
+  process.PATextraction.doPhoton   = True
 
   process.PATextraction.doMET      = True
   if useShiftCorrectedMET:

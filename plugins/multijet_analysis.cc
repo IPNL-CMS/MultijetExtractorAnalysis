@@ -774,26 +774,6 @@ void multijet_analysis::analyze(const edm::EventSetup& iSetup, PatExtractor& ext
 	CHECK_RES_AND_RETURN(res, m_pass_beta_cut);
 
 
-	
-// 	m_pass_electron_cut = ElectronSel();
-// 	m_pass_Jet_cut1 = JetSel1();
-// 	m_pass_1stJet_cut = FirstJetSel();
-// 	m_pass_2ndJet_cut = SecondJetSel();
-// 	m_pass_photon_cut = PhotonSel();
-// 	m_pass_vertex_cut = VertexSel();
-// 	m_pass_alpha_cut = AlphaSel();
-// 	m_pass_beta_cut = BetaSel();
-	
-	//pass_all_cuts = m_pass_electron_cut + m_pass_muon_cut + m_pass_1stJet_cut + m_pass_beta_cut + m_pass_Jet_cut	                + m_pass_2ndJet_cut + m_pass_photon_cut + m_pass_vertex_cut + m_pass_MET_cut + m_pass_alpha_cut;
-	
-	
-// 	if(pass_all_cuts != 10)
-// 		m_multijet_isSel = 0;
-// 	else {
-// 		m_multijet_isSel = 1;
-// 		m_MJB = GetMJB();
-// 	}
-
 	m_multijet_isSel = 1;
 	
 	new((*m_leadingjet_lorentzvector)[0]) TLorentzVector(*(m_jetMet->getP4(0)));
