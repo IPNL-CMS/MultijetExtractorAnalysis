@@ -35,6 +35,7 @@ class multijet_analysis: public patextractor::Plugin {
 		virtual void analyze(const edm::EventSetup& iSetup, PatExtractor& extractor);
 		void fillTree();
 		void reset();
+		float computeHT();
 		float GetMuu();
 		float GetMJB(float ptLeading, float ptRecoil);
 		int CountJetsPt30();
@@ -69,6 +70,8 @@ class multijet_analysis: public patextractor::Plugin {
 		std::shared_ptr<PhotonExtractor> m_photon;
 		
 		std::shared_ptr<VertexExtractor> m_vertex;
+		
+		float m_HT;
 		
 		float m_Muu;
 		float m_MJB;

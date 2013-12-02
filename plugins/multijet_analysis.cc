@@ -32,6 +32,7 @@ multijet_analysis::multijet_analysis(const edm::ParameterSet& cmsswSettings): Pl
   m_tree_Multijet = new TTree("Multijet", "Analysis info");
 
   /// Branches definition
+  m_tree_Multijet->Branch("HT"         , &m_HT             , "HT/F");
   m_tree_Multijet->Branch("n_jets"         , &m_n_jets             , "n_jets/I");
   m_tree_Multijet->Branch("n_jets_puLoose"         , &m_n_jets_puLoose             , "n_jets_puLoose/I");
   m_tree_Multijet->Branch("n_goodJets"         , &m_n_goodJets             , "n_goodJets/I");
@@ -125,6 +126,20 @@ multijet_analysis::multijet_analysis(const edm::ParameterSet& cmsswSettings): Pl
 multijet_analysis::~multijet_analysis()
 {
 
+}
+
+float multijet_analysis::computeHT()
+{
+	float HT = 0;
+	int n_jet = m_jetMet->getSize();
+	
+	if (! n_jet)
+		return 0;
+	
+	for(int i=0; i<n_jet; i++) {
+		HT = HT + m_jetMet->getP4(i)->Pt();
+	}
+	return HT;
 }
 
 int multijet_analysis::isGoodIsolatedElectron(int index) 
@@ -692,6 +707,8 @@ void multijet_analysis::analyze(const edm::EventSetup& iSetup, PatExtractor& ext
 	m_photon   = std::static_pointer_cast<PhotonExtractor>(extractor.getExtractor("photons"));
 	m_vertex   = std::static_pointer_cast<VertexExtractor>(extractor.getExtractor("vertex"));
 	
+	m_HT = computeHT();
+	
 	m_Muu = GetMuu();
 	
 	//m_met = m_jetMet->getMETLorentzVector(0)->Pt();
@@ -841,6 +858,7 @@ void multijet_analysis::reset()
 	m_jet_isPFJetLoose[i] =  -1;
 	m_jet_puJetId[i]      =  -1;
   }
+  m_HT                  	 = -1;
   m_MJB                  	 = -1;
   m_Muu                  	 = -1;
   //m_met                  	 = -1;
