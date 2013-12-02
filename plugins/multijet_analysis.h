@@ -58,6 +58,7 @@ class multijet_analysis: public patextractor::Plugin {
 		TClonesArray* m_leadingjetgen_lorentzvector;
 		TClonesArray* m_recoil_lorentzvector;
 		TClonesArray* m_jets_recoil_lorentzvector;
+		TClonesArray* m_jetsgen_recoil_lorentzvector;
 		  
 		std::shared_ptr<MuonExtractor> m_muon;
 		  

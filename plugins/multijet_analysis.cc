@@ -24,6 +24,7 @@ multijet_analysis::multijet_analysis(const edm::ParameterSet& cmsswSettings): Pl
   m_leadingjet_lorentzvector = new TClonesArray("TLorentzVector");
   m_leadingjetgen_lorentzvector = new TClonesArray("TLorentzVector");
   m_jets_recoil_lorentzvector = new TClonesArray("TLorentzVector");
+  m_jetsgen_recoil_lorentzvector = new TClonesArray("TLorentzVector");
   
   //reset();
 
@@ -75,9 +76,9 @@ multijet_analysis::multijet_analysis(const edm::ParameterSet& cmsswSettings): Pl
   m_tree_Multijet->Branch("leadingjet_4vector","TClonesArray",&m_leadingjet_lorentzvector, 5000, 0);
   m_tree_Multijet->Branch("leadingjetgen_4vector","TClonesArray",&m_leadingjetgen_lorentzvector, 5000, 0);
   m_tree_Multijet->Branch("recoil_4vector","TClonesArray",&m_recoil_lorentzvector, 5000, 0);
-  m_tree_Multijet->Branch("n_jets_recoil"         , &m_n_jets_recoil            
-  , "n_jets_recoil/I");
+  m_tree_Multijet->Branch("n_jets_recoil", &m_n_jets_recoil, "n_jets_recoil/I");
   m_tree_Multijet->Branch("jets_recoil_4vector","TClonesArray",&m_jets_recoil_lorentzvector, 5000, 0);
+  m_tree_Multijet->Branch("jetsgen_recoil_4vector","TClonesArray",&m_jetsgen_recoil_lorentzvector, 5000, 0);
   m_tree_Multijet->Branch("secondjetpt", &m_secondjetpt, "secondjetpt/F");
   m_tree_Multijet->Branch("alpha", &m_alpha, "alpha/F");
   m_tree_Multijet->Branch("beta", &m_beta, "beta/F");
@@ -361,20 +362,9 @@ int multijet_analysis::FirstJetSel()
 	if (! n_jet)
 		return 0;
 	
-	int indexMaxPt = 0;
-	float maxPt = fabs(m_jetMet->getP4(0)->Pt());
-	
-	for (int i = 0; i < n_jet; i++)
-	{
-		TLorentzVector *jetP = m_jetMet->getP4(i);
-		if(fabs(jetP->Pt())>maxPt) 
-		{
-			indexMaxPt = i;
-			maxPt = fabs(jetP->Pt());
-		}		
-	}
+	float firstJetPt = fabs(m_jetMet->getP4(0)->Pt());
 
-	if(maxPt <= m_JET1_Pt_min && fabs(m_jetMet->getP4(indexMaxPt)->Eta())>= m_JET1_Eta_max)
+	if(firstJetPt <= m_JET1_Pt_min && fabs(m_jetMet->getP4(0)->Eta())>= m_JET1_Eta_max)
 		return 0;
 	
 	return 1;
@@ -783,8 +773,10 @@ void multijet_analysis::analyze(const edm::EventSetup& iSetup, PatExtractor& ext
 	for (int i = 1; i < m_n_jets; i++)
 	{
 		TLorentzVector *jetP = m_jetMet->getP4(i);
+		TLorentzVector *jetgenP = m_jetMet->getGenP4(i);
 		if(1) { //put here the condition on the PU jet ID
 			new((*m_jets_recoil_lorentzvector)[m_n_jets_recoil]) TLorentzVector(*jetP);
+			new((*m_jetsgen_recoil_lorentzvector)[m_n_jets_recoil]) TLorentzVector(*jetgenP);
 			m_n_jets_recoil ++;
 		}
 	}
@@ -874,6 +866,9 @@ void multijet_analysis::reset()
     
   if (m_jets_recoil_lorentzvector)
     m_jets_recoil_lorentzvector->Clear();
+    
+  if (m_jetsgen_recoil_lorentzvector)
+    m_jetsgen_recoil_lorentzvector->Clear();
 
   if (m_met_lorentzvector)
     m_met_lorentzvector->Clear();
