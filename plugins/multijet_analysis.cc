@@ -364,7 +364,7 @@ int multijet_analysis::FirstJetSel()
 	
 	float firstJetPt = fabs(m_jetMet->getP4(0)->Pt());
 
-	if(firstJetPt <= m_JET1_Pt_min && fabs(m_jetMet->getP4(0)->Eta())>= m_JET1_Eta_max)
+	if(firstJetPt <= m_JET1_Pt_min || fabs(m_jetMet->getP4(0)->Eta())>= m_JET1_Eta_max)
 		return 0;
 	
 	return 1;
