@@ -90,7 +90,6 @@ multijet_analysis::multijet_analysis(const edm::ParameterSet& cmsswSettings): Pl
   
  
   //FirstJetSel(); 
-  m_JET1_Pt_min = cmsswSettings.getParameter<edm::ParameterSet>("firstJet").getParameter<double>("pt_min");
   m_JET1_Eta_max = cmsswSettings.getParameter<edm::ParameterSet>("firstJet").getParameter<double>("eta_max");
   
   //JetSel()	
@@ -376,10 +375,8 @@ int multijet_analysis::FirstJetSel()
 	
 	if (! n_jet)
 		return 0;
-	
-	float firstJetPt = fabs(m_jetMet->getP4(0)->Pt());
 
-	if(firstJetPt <= m_JET1_Pt_min || fabs(m_jetMet->getP4(0)->Eta())>= m_JET1_Eta_max)
+	if(fabs(m_jetMet->getP4(0)->Eta())>= m_JET1_Eta_max)
 		return 0;
 	
 	return 1;

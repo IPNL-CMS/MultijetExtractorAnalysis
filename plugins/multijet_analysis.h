@@ -85,8 +85,7 @@ class multijet_analysis: public patextractor::Plugin {
 		
 		//config
 		float m_MET_Pt_min;
-		
-		float m_JET1_Pt_min;
+
 		float m_JET1_Eta_max;
 		
 		float m_JETS_Number_min;
