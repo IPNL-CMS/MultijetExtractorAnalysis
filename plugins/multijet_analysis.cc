@@ -65,6 +65,7 @@ multijet_analysis::multijet_analysis(const edm::ParameterSet& cmsswSettings): Pl
   m_tree_Multijet->Branch("pass_vertex_cut", &m_pass_vertex_cut, "pass_vertex_cut/I");
   m_tree_Multijet->Branch("pass_Jet_cut1", &m_pass_Jet_cut1, "pass_Jet_cut1/I");
   m_tree_Multijet->Branch("pass_Jet_cut2", &m_pass_Jet_cut2, "pass_Jet_cut2/I");
+  m_tree_Multijet->Branch("pass_recoil_cut", &m_pass_recoil_cut, "pass_recoil_cut/I");
   m_tree_Multijet->Branch("pass_1stJet_cut", &m_pass_1stJet_cut, "pass_1stJet_cut/I");
   m_tree_Multijet->Branch("pass_2ndJet_cut", &m_pass_2ndJet_cut, "pass_2ndJet_cut/I");
   m_tree_Multijet->Branch("pass_alpha_cut", &m_pass_alpha_cut, "pass_alpha_cut/I");
@@ -368,6 +369,18 @@ int multijet_analysis::ElectronSel()
 	return pass_ele_sel;
 }
 
+int multijet_analysis::RecoilSel(TLorentzVector recoil_p4)
+{
+	int n_jet = m_jetMet->getSize();
+	
+	if (! n_jet)
+		return 0;
+
+	if(recoil_p4.Pt() <= 210.)
+		return 0;
+	
+	return 1;
+}
 
 int multijet_analysis::FirstJetSel()
 {
@@ -762,12 +775,15 @@ void multijet_analysis::analyze(const edm::EventSetup& iSetup, PatExtractor& ext
 	
 	res = JetSel2();
 	CHECK_RES_AND_RETURN(res, m_pass_Jet_cut2);
+	
+	TLorentzVector recoil = getRecoilLorentzVector();
+	
+	res = RecoilSel(recoil);
+	CHECK_RES_AND_RETURN(res, m_pass_recoil_cut);
 
 	res = FirstJetSel();
 	CHECK_RES_AND_RETURN(res, m_pass_1stJet_cut);
 	
-	TLorentzVector recoil = getRecoilLorentzVector();
-
 	res = SecondJetSel(recoil);
 	CHECK_RES_AND_RETURN(res, m_pass_2ndJet_cut);
 
@@ -862,6 +878,7 @@ void multijet_analysis::reset()
   m_pass_electron_cut	         = -1; 
   m_pass_Jet_cut1         	 = -1;
   m_pass_Jet_cut2         	 = -1;
+  m_pass_recoil_cut      	 = -1;
   m_pass_1stJet_cut      	 = -1;
   m_pass_2ndJet_cut      	 = -1;
   m_pass_vertex_cut      	 = -1;

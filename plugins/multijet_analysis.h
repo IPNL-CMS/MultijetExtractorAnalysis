@@ -143,6 +143,7 @@ class multijet_analysis: public patextractor::Plugin {
 		int ElectronSel();
 		int JetSel1();
 		int JetSel2();
+		int RecoilSel(TLorentzVector recoil_p4);
 		int FirstJetSel();
 		int VertexSel();
 		int SecondJetSel(TLorentzVector recoil);
@@ -154,6 +155,7 @@ class multijet_analysis: public patextractor::Plugin {
 		// Cut ; -1 event drop before arriving to this cut ; 0 cut failed, 1 cut passed
 		int m_pass_electron_cut;
 		int m_pass_vertex_cut;
+		int m_pass_recoil_cut;
 		int m_pass_Jet_cut1;
 		int m_pass_Jet_cut2;
 		int m_pass_1stJet_cut;
