@@ -723,18 +723,18 @@ void multijet_analysis::analyze(const edm::EventSetup& iSetup, PatExtractor& ext
 		fillTree();
     		return; 
 	}
-	
-	m_n_jets_pt30 = CountJetsPt30();
-	m_n_muons = m_muon->getSize();
-	m_n_goodJets = getNgoodJets() ;
-	m_n_photons = m_photon->getSize();
-	
+
 	if(m_n_jets != 0) {
 	  for(int i=0; i<m_n_jets; i++) {
 	    m_jet_isPFJetLoose[i] =  m_jetMet->isPFJetLoose(i);
 	    m_jet_puJetId[i]      =  m_jetMet->getPuJetId(i);
 	  }
 	}
+	
+	m_n_jets_pt30 = CountJetsPt30();
+	m_n_muons = m_muon->getSize();
+	m_n_goodJets = getNgoodJets() ;
+	m_n_photons = m_photon->getSize();
 	
 	if(m_n_muons != 0) {
 	  for(int i=0; i<m_n_muons; i++) {
