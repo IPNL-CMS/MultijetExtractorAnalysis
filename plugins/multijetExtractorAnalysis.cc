@@ -40,6 +40,10 @@ multijetExtractorAnalysis::multijetExtractorAnalysis(const edm::ParameterSet& cm
   m_tree_Multijet->Branch("jet_puJetId",  &m_jet_puJetId,   "jet_puJetId[n_jets]/I"); 
    
   m_tree_Multijet->Branch("n_muons"         , &m_n_muons             , "n_muons/I");
+  m_tree_Multijet->Branch("n_muons_loose"         , &m_n_muons_loose             , "n_muons_loose/I");
+  m_tree_Multijet->Branch("n_muons_soft"         , &m_n_muons_soft             , "n_muons_soft/I");
+  m_tree_Multijet->Branch("n_muons_tight"         , &m_n_muons_tight             , "n_muons_tight/I");
+  m_tree_Multijet->Branch("n_muons_highPt"         , &m_n_muons_highPt             , "n_muons_highPt/I");
   m_tree_Multijet->Branch("muon_isLooseMuon",  &m_muon_isLooseMuon,   "muon_isLooseMuon[n_muons]/I");  
   m_tree_Multijet->Branch("muon_isSoftMuon",  &m_muon_isSoftMuon,   "muon_isSoftMuon[n_muons]/I");  
   m_tree_Multijet->Branch("muon_isTightMuon",  &m_muon_isTightMuon,   "muon_isTightMuon[n_muons]/I"); 
@@ -47,10 +51,13 @@ multijetExtractorAnalysis::multijetExtractorAnalysis(const edm::ParameterSet& cm
   m_tree_Multijet->Branch("muon_isIsolatedMuon",  &m_muon_isIsolatedMuon,   "muon_isIsolatedMuon[n_muons]/I");  
 
   m_tree_Multijet->Branch("n_photons"         , &m_n_photons             , "n_photons/I");
-  m_tree_Multijet->Branch("photon_pt",  &m_photon_pt,   "photon_pt[n_photons]/I"); 
+  m_tree_Multijet->Branch("n_photons_loose"         , &m_n_photons_loose            , "n_photons_loose/I");
+  m_tree_Multijet->Branch("n_photons_medium"         , &m_n_photons_medium             , "n_photons_medium/I");
+  m_tree_Multijet->Branch("n_photons_tight"         , &m_n_photons_tight             , "n_photons_tight/I");  
   m_tree_Multijet->Branch("photon_isLoosePhoton",  &m_photon_isLoosePhoton,   "photon_isLoosePhoton[n_photons]/I"); 
   m_tree_Multijet->Branch("photon_isMediumPhoton",  &m_photon_isMediumPhoton,   "photon_isMediumPhoton[n_photons]/I");  
   m_tree_Multijet->Branch("photon_isTightPhoton",  &m_photon_isTightPhoton,   "photon_isTightPhoton[n_photons]/I");   
+  m_tree_Multijet->Branch("photon_pt",  &m_photon_pt,   "photon_pt[n_photons]/I"); 
 
 //   m_tree_Multijet->Branch("n_electrons"         , &m_n_electrons             , "n_electrons/I");
 //   m_tree_Multijet->Branch("electron_isGoodElectron",  &m_electron_isGoodElectron,   "electron_isGoodElectron[n_electrons]/I");  
@@ -489,6 +496,125 @@ int multijetExtractorAnalysis::CountJetsPuLoose()
 	return n_jet_puLoose;
 }
 
+int multijetExtractorAnalysis::CountPhotonsLoose(int n_photons)
+{
+	int n_photons_loose = 0;
+		
+	if(n_photons != 0) {	
+		for (int i = 0; i < n_photons; i++)
+		{
+			if(m_photon_isLoosePhoton[i] == 1) 
+			{
+				n_photons_loose = n_photons_loose + 1;
+			}		
+		}
+	}
+	
+	return n_photons_loose;
+}
+
+int multijetExtractorAnalysis::CountPhotonsMedium(int n_photons)
+{
+	int n_photons_medium = 0;
+		
+	if(n_photons != 0) {	
+		for (int i = 0; i < n_photons; i++)
+		{
+			if(m_photon_isMediumPhoton[i] == 1) 
+			{
+				n_photons_medium = n_photons_medium + 1;
+			}		
+		}
+	}
+	
+	return n_photons_medium;
+}
+
+int multijetExtractorAnalysis::CountPhotonsTight(int n_photons)
+{
+	int n_photons_tight = 0;
+		
+	if(n_photons != 0) {	
+		for (int i = 0; i < n_photons; i++)
+		{
+			if(m_photon_isTightPhoton[i] == 1) 
+			{
+				n_photons_tight = n_photons_tight + 1;
+			}		
+		}
+	}
+	
+	return n_photons_tight;
+}
+
+int multijetExtractorAnalysis::CountMuonsLoose(int n_muons)
+{
+	int n_muons_loose = 0;
+		
+	if(n_muons != 0) {	
+		for (int i = 0; i < n_muons; i++)
+		{
+			if(m_muon_isLooseMuon[i] == 1) 
+			{
+				n_muons_loose = n_muons_loose + 1;
+			}		
+		}
+	}
+	
+	return n_muons_loose;
+}
+
+int multijetExtractorAnalysis::CountMuonsSoft(int n_muons)
+{
+	int n_muons_soft = 0;
+		
+	if(n_muons != 0) {	
+		for (int i = 0; i < n_muons; i++)
+		{
+			if(m_muon_isSoftMuon[i] == 1) 
+			{
+				n_muons_soft = n_muons_soft + 1;
+			}		
+		}
+	}
+	
+	return n_muons_soft;
+}
+
+int multijetExtractorAnalysis::CountMuonsTight(int n_muons)
+{
+	int n_muons_tight = 0;
+		
+	if(n_muons != 0) {	
+		for (int i = 0; i < n_muons; i++)
+		{
+			if(m_muon_isTightMuon[i] == 1) 
+			{
+				n_muons_tight = n_muons_tight + 1;
+			}		
+		}
+	}
+	
+	return n_muons_tight;
+}
+
+int multijetExtractorAnalysis::CountMuonsHighPt(int n_muons)
+{
+	int n_muons_highPt = 0;
+		
+	if(n_muons != 0) {	
+		for (int i = 0; i < n_muons; i++)
+		{
+			if(m_muon_isHighPtMuon[i] == 1) 
+			{
+				n_muons_highPt = n_muons_highPt + 1;
+			}		
+		}
+	}
+	
+	return n_muons_highPt;
+}
+
 
 int multijetExtractorAnalysis::VertexSel()
 {
@@ -755,6 +881,10 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 	    m_muon_isHighPtMuon[i] = isHighPtMuon(i);
 	    m_muon_isIsolatedMuon[i] = isIsolatedMuon(i);
 	  }
+	  m_n_muons_loose = CountMuonsLoose(m_n_muons);
+	  m_n_muons_soft = CountMuonsSoft(m_n_muons);
+	  m_n_muons_tight = CountMuonsTight(m_n_muons);
+	  m_n_muons_highPt = CountMuonsHighPt(m_n_muons);
 	}
 
 	if(m_n_photons != 0) {
@@ -764,39 +894,12 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 	    m_photon_isMediumPhoton[i] = isMediumPhoton(i);	
 	    m_photon_isTightPhoton[i] = isTightPhoton(i);
 	  }
+	  m_n_photons_loose = CountPhotonsLoose(m_n_photons);
+	  m_n_photons_medium = CountPhotonsMedium(m_n_photons);
+	  m_n_photons_tight = CountPhotonsTight(m_n_photons);
 	}
-	
-	int res = ElectronSel();
-	CHECK_RES_AND_RETURN(res, m_pass_electron_cut);
 
-	res = VertexSel();
-	CHECK_RES_AND_RETURN(res, m_pass_vertex_cut);
-
-	res = JetSel1();
-	CHECK_RES_AND_RETURN(res, m_pass_Jet_cut1);
-	
-	res = JetSel2();
-	CHECK_RES_AND_RETURN(res, m_pass_Jet_cut2);
-	
 	TLorentzVector recoil = getRecoilLorentzVector();
-	
-	res = RecoilSel(recoil);
-	CHECK_RES_AND_RETURN(res, m_pass_recoil_cut);
-
-	res = FirstJetSel();
-	CHECK_RES_AND_RETURN(res, m_pass_1stJet_cut);
-	
-	res = SecondJetSel(recoil);
-	CHECK_RES_AND_RETURN(res, m_pass_2ndJet_cut);
-
-	res = AlphaSel(recoil);
-	CHECK_RES_AND_RETURN(res, m_pass_alpha_cut);
-
-	res = BetaSel();
-	CHECK_RES_AND_RETURN(res, m_pass_beta_cut);
-
-
-	m_multijet_isSel = 1;
 	
 	new((*m_leadingjet_lorentzvector)[0]) TLorentzVector(*(m_jetMet->getP4(0)));
 	new((*m_leadingjetgen_lorentzvector)[0]) TLorentzVector(*(m_jetMet->getGenP4(0)));
@@ -814,13 +917,47 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 	}
 	new((*m_recoil_lorentzvector)[0]) TLorentzVector(recoil);
 	
-	m_secondjetpt = m_jetMet->getP4(1)->Pt();
+	if (m_jetMet->getP4(1)) {
+		m_secondjetpt = m_jetMet->getP4(1)->Pt();
+	}
 	m_alpha = computeAlpha(recoil);
-	m_beta = computeBeta(m_n_jets);
-	
+	m_beta = computeBeta(m_n_jets);	
 	float ptrecoil = ((TLorentzVector*) (m_recoil_lorentzvector->At(0)))->Pt();
 	float leadingjetpt = ((TLorentzVector*) (m_leadingjet_lorentzvector->At(0)))->Pt();
 	m_A = fabs(m_secondjetpt)/fabs(ptrecoil);
+	
+	int res = ElectronSel();
+	CHECK_RES_AND_RETURN(res, m_pass_electron_cut);
+
+	res = VertexSel();
+	CHECK_RES_AND_RETURN(res, m_pass_vertex_cut);
+
+	res = JetSel1();
+	CHECK_RES_AND_RETURN(res, m_pass_Jet_cut1);
+	
+	res = JetSel2();
+	CHECK_RES_AND_RETURN(res, m_pass_Jet_cut2);
+	
+	
+	
+	res = RecoilSel(recoil);
+	CHECK_RES_AND_RETURN(res, m_pass_recoil_cut);
+
+	res = FirstJetSel();
+	CHECK_RES_AND_RETURN(res, m_pass_1stJet_cut);
+	
+	res = SecondJetSel(recoil);
+	CHECK_RES_AND_RETURN(res, m_pass_2ndJet_cut);
+
+	res = AlphaSel(recoil);
+	CHECK_RES_AND_RETURN(res, m_pass_alpha_cut);
+
+	res = BetaSel();
+	CHECK_RES_AND_RETURN(res, m_pass_beta_cut);
+
+
+	m_multijet_isSel = 1;	
+
 	
 	m_MJB = GetMJB(leadingjetpt,ptrecoil);
 
@@ -840,6 +977,10 @@ void multijetExtractorAnalysis::reset()
   m_n_jets_puLoose             	 = -1;
   m_n_goodJets               	 = -1;
   m_n_muons               	 = -1;
+  m_n_muons_loose = -1;
+  m_n_muons_soft = -1;
+  m_n_muons_tight = -1;
+  m_n_muons_highPt = -1;
   m_n_electrons               	 = -1;
   m_n_jets_pt30          	 = -1;
   m_n_jets_recoil                = -1;
@@ -851,7 +992,10 @@ void multijetExtractorAnalysis::reset()
     m_muon_isHighPtMuon[i]   = -1;
     m_muon_isIsolatedMuon[i] = -1;
   }
-  
+  m_n_photons		       = -1;
+  m_n_photons_loose = -1;
+  m_n_photons_medium = -1;
+  m_n_photons_tight = -1;
   for (int i=0;i<m_photons_MAX;++i) 
   {
     m_photon_pt[i]               = -1;

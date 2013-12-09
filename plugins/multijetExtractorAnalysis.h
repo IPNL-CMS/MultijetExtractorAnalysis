@@ -40,6 +40,13 @@ class multijetExtractorAnalysis: public patextractor::Plugin {
 		float GetMJB(float ptLeading, float ptRecoil);
 		int CountJetsPt30();
 		int CountJetsPuLoose();
+		int CountPhotonsLoose(int n_photons);
+		int CountPhotonsMedium(int n_photons);
+		int CountPhotonsTight(int n_photons);
+		int CountMuonsLoose(int n_muons);
+		int CountMuonsSoft(int n_muons);
+		int CountMuonsTight(int n_muons);
+		int CountMuonsHighPt(int n_muons);
 		TLorentzVector getRecoilLorentzVector();
 		int getNgoodJets();
 		float computeAlpha(TLorentzVector recoil);
@@ -51,7 +58,14 @@ class multijetExtractorAnalysis: public patextractor::Plugin {
 		int m_n_jets_puLoose;
 		int m_n_goodJets;
 		int m_n_muons;
+		int m_n_muons_loose;
+		int m_n_muons_soft;
+		int m_n_muons_tight;
+		int m_n_muons_highPt;
 		int m_n_photons;
+		int m_n_photons_loose;
+		int m_n_photons_medium;
+		int m_n_photons_tight;
 		int m_n_electrons;
 		int m_n_jets_pt30;
 		int m_n_jets_recoil;
