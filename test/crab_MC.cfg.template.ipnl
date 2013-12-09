@@ -1,6 +1,6 @@
 [CRAB]
 jobtype = cmssw
-scheduler = glite
+scheduler = RemoteGlideIn
 use_server = 0
 
 [CMSSW]
@@ -8,7 +8,7 @@ use_server = 0
 dbs_url = http://cmsdbsprod.cern.ch/cms_dbs_ph_analysis_02/servlet/DBSServlet
 datasetpath = @datasetname@
 
-pset = Extractor_MTT_MC.py
+pset = Extractor_MULTIJET_MC.py
 
 total_number_of_events = -1
 
@@ -16,9 +16,7 @@ total_number_of_events = -1
 events_per_job = 400000
 
 ### The output files produced by your application (comma separated list)
-output_file = extracted_mc.root
-
-additional_input_files = kfparams_semilept.dat
+output_file = extracted.root
 
 [USER]
 

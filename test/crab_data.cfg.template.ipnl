@@ -1,6 +1,6 @@
 [CRAB]
 jobtype = cmssw
-scheduler = glite
+scheduler = remoteGlideIn
 use_server = 0
 
 [CMSSW]
@@ -19,8 +19,6 @@ lumis_per_job = 1000
 ### The output files produced by your application (comma separated list)
 output_file = extracted.root
 
-additional_input_files = kfparams_semilept.dat
-
 [USER]
 
 eMail = @email@
@@ -38,4 +36,4 @@ check_user_remote_dir = 0
 [GRID]
 rb = CERN
 virtual_organization = cms
-ce_white_list=T3_FR_IPNL
+
