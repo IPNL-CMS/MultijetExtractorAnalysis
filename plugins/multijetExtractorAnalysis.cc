@@ -93,10 +93,11 @@ multijetExtractorAnalysis::multijetExtractorAnalysis(const edm::ParameterSet& cm
   m_tree_Multijet->Branch("alpha", &m_alpha, "alpha/F");
   m_tree_Multijet->Branch("beta", &m_beta, "beta/F");
   m_tree_Multijet->Branch("A", &m_A, "A/F");
+
   
-  m_tree_Multijet->Branch("Muu"         , &m_Muu             , "Muu/F");
-  
-  
+
+  //removePUJets(); 
+  m_removePUJets = cmsswSettings.getParameter<edm::ParameterSet>("PUJets").getParameter<bool>("removePUJets");  
  
   //FirstJetSel(); 
   m_JET1_Eta_max = cmsswSettings.getParameter<edm::ParameterSet>("firstJet").getParameter<double>("eta_max");
@@ -746,75 +747,6 @@ float multijetExtractorAnalysis::GetMJB(float ptLeading, float ptRecoil)
 }
 	
 
-float multijetExtractorAnalysis::GetMuu()
-{
-	int n_mu = m_muon->getSize();
-	
-	int n_goodMu = 0;
-	
-	float Muu = -1;
-	
-	float E1, E2, px1, px2, py1, py2, pz1, pz2;
-	
-	if (n_mu == 2) {
-		for (int i = 0; i < 2; i++) {
-			if (! m_muon->getMuisGlobal(i))
-				continue;
-
-			TLorentzVector *muP = m_muon->getMuLorentzVector(i);
-
-			if (fabs(muP->Pt()) <= 26)
-				continue;
-
-			if (fabs(muP->Eta()) >= 2.1)
-				continue;
-
-			if (m_muon->getMunormChi2(i) >= 10.)
-				continue;
-
-			if (m_muon->getTrackerLayersWithMeasurements(i) <= 5)
-				continue;
-
-			if (m_muon->getGlobalTrackNumberOfValidMuonHits(i) <= 0)
-				continue;
-
-			if (m_muon->getNumberOfMatchedStations(i) <= 1)
-				continue;
-
-			if (m_muon->getMudB(i) >= 0.2)
-				continue;
-
-			if (m_muon->getdZ(i) >= 0.5)
-				continue;
-
-			if (m_muon->getMunValPixelHits(i) <= 0)
-				continue;
-			
-			if (i == 0) {
-				E1  = muP->E() ;
-				px1 = muP->Px() ;
-				py1 = muP->Py() ;
-				pz1 = muP->Pz() ; 
-			}
-			else {
-				E2  = muP->E() ;
-				px2 = muP->Px() ;
-				py2 = muP->Py() ;
-				pz2 = muP->Pz() ; 			
-			}
-			
-			n_goodMu = n_goodMu + 1;
-		}
-		
-		if(n_goodMu == 2) {
-			Muu = sqrt(pow(E1+E2,2) - pow(px1+px2,2) - pow(py1+py2,2) - pow(pz1+pz2,2));		
-		}		
-	}
-
-	
-	return Muu;
-}
-
 
 #define CHECK_RES_AND_RETURN(res, var) \
   if (res != 1) { \
@@ -845,8 +777,6 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 	m_vertex   = std::static_pointer_cast<VertexExtractor>(extractor.getExtractor("vertex"));
 	
 	m_HT = computeHT();
-	
-	m_Muu = GetMuu();
 	
 	//m_met = m_jetMet->getMETLorentzVector(0)->Pt();
 	new((*m_met_lorentzvector)[0]) TLorentzVector(*(m_jetMet->getMETLorentzVector(0)));
@@ -1020,7 +950,6 @@ void multijetExtractorAnalysis::reset()
   }
   m_HT                  	 = -1;
   m_MJB                  	 = -1;
-  m_Muu                  	 = -1;
   //m_met                  	 = -1;
   m_pass_electron_cut	         = -1; 
   m_pass_Jet_cut1         	 = -1;

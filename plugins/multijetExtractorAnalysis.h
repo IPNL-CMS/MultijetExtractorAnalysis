@@ -36,7 +36,6 @@ class multijetExtractorAnalysis: public patextractor::Plugin {
 		void fillTree();
 		void reset();
 		float computeHT();
-		float GetMuu();
 		float GetMJB(float ptLeading, float ptRecoil);
 		int CountJetsPt30();
 		int CountJetsPuLoose();
@@ -87,7 +86,6 @@ class multijetExtractorAnalysis: public patextractor::Plugin {
 		
 		float m_HT;
 		
-		float m_Muu;
 		float m_MJB;
 		
 		//float m_met;
@@ -98,6 +96,7 @@ class multijetExtractorAnalysis: public patextractor::Plugin {
 		float m_A;
 		
 		//config
+		bool m_removePUJets;
 		float m_MET_Pt_min;
 
 		float m_JET1_Eta_max;
