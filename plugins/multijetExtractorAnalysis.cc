@@ -32,12 +32,15 @@ multijetExtractorAnalysis::multijetExtractorAnalysis(const edm::ParameterSet& cm
   m_tree_Multijet = new TTree("Multijet", "Analysis info");
 
   /// Branches definition
-  m_tree_Multijet->Branch("HT"         , &m_HT             , "HT/F");
-  m_tree_Multijet->Branch("n_jets"         , &m_n_jets             , "n_jets/I");
-  m_tree_Multijet->Branch("n_jets_puLoose"         , &m_n_jets_puLoose             , "n_jets_puLoose/I");
+  
+  m_tree_Multijet->Branch("n_totJets"         , &m_n_totJets             , "n_totJets/I");
   m_tree_Multijet->Branch("n_goodJets"         , &m_n_goodJets             , "n_goodJets/I");
-  m_tree_Multijet->Branch("jet_isPFJetLoose",  &m_jet_isPFJetLoose,   "jet_isPFJetLoose[n_jets]/I"); 
-  m_tree_Multijet->Branch("jet_puJetId",  &m_jet_puJetId,   "jet_puJetId[n_jets]/I"); 
+  m_tree_Multijet->Branch("n_puLooseJets"         , &m_n_puLooseJets             , "n_puLooseJets/I");
+  m_tree_Multijet->Branch("n_PFLooseJets"         , &m_n_PFLooseJets             , "n_PFLooseJets/I");
+  m_tree_Multijet->Branch("jet_isPFJetLoose",  &m_jet_isPFJetLoose,   "jet_isPFJetLoose[n_totJets]/I"); 
+  m_tree_Multijet->Branch("jet_puJetId",  &m_jet_puJetId,   "jet_puJetId[n_totJets]/I"); 
+  m_tree_Multijet->Branch("goodJetsIndex",  &m_goodJetsIndex); 
+  m_tree_Multijet->Branch("HT"         , &m_HT             , "HT/F");
    
   m_tree_Multijet->Branch("n_muons"         , &m_n_muons             , "n_muons/I");
   m_tree_Multijet->Branch("n_muons_loose"         , &m_n_muons_loose             , "n_muons_loose/I");
@@ -137,16 +140,35 @@ multijetExtractorAnalysis::~multijetExtractorAnalysis()
 
 }
 
+std::vector<int> multijetExtractorAnalysis::getGoodJetsIndex() {
+	std::vector<int> myVector;
+	int n_jet = m_jetMet->getSize();
+	
+	if (n_jet > 0) {
+		for(int i=0; i<n_jet; i++) {
+			if(m_removePUJets) {
+				if(!(m_jet_puJetId[i] == 1)) {
+					myVector.push_back(i);
+				}
+			}
+			else {
+				myVector.push_back(i);
+			}
+		}
+	}
+	return myVector;
+}
+
 float multijetExtractorAnalysis::computeHT()
 {
 	float HT = 0;
-	int n_jet = m_jetMet->getSize();
+	int n_jet = m_goodJetsIndex.size();
 	
 	if (! n_jet)
 		return 0;
 	
 	for(int i=0; i<n_jet; i++) {
-		HT = HT + m_jetMet->getP4(i)->Pt();
+		HT = HT + m_jetMet->getP4(m_goodJetsIndex.at(i))->Pt();
 	}
 	return HT;
 }
@@ -172,22 +194,22 @@ int multijetExtractorAnalysis::isGoodIsolatedElectron(int index)
 	return isGood;
 }
 
-int multijetExtractorAnalysis::getNgoodJets() 
+int multijetExtractorAnalysis::getN_PFJets() 
 {
 	int n_jet = m_jetMet->getSize();
-	int n_goodjet = 0;
+	int n_PFLooseJets = 0;
 	
-	if(n_jet == 0) n_goodjet = 0;
+	if(n_jet == 0) n_PFLooseJets = 0;
 
 	if(n_jet != 0) {
 		for(int i=0; i<n_jet; i++) {
 			if(m_jet_isPFJetLoose[i] == 1) {
-				n_goodjet = n_goodjet + 1;
+				n_PFLooseJets = n_PFLooseJets + 1;
 			}
 		}
 	}
 	
-	return n_goodjet;
+	return n_PFLooseJets;
 }
 
 
@@ -380,7 +402,7 @@ int multijetExtractorAnalysis::ElectronSel()
 
 int multijetExtractorAnalysis::RecoilSel(TLorentzVector recoil_p4)
 {
-	int n_jet = m_jetMet->getSize();
+	int n_jet = m_goodJetsIndex.size();
 	
 	if (! n_jet)
 		return 0;
@@ -393,12 +415,10 @@ int multijetExtractorAnalysis::RecoilSel(TLorentzVector recoil_p4)
 
 int multijetExtractorAnalysis::FirstJetSel()
 {
-	int n_jet = m_jetMet->getSize();
-	
-	if (! n_jet)
+	if (! m_goodJetsIndex.size())
 		return 0;
 
-	if(fabs(m_jetMet->getP4(0)->Eta())>= m_JET1_Eta_max)
+	if(fabs(m_jetMet->getP4(m_goodJetsIndex.at(0))->Eta()) >= m_JET1_Eta_max)
 		return 0;
 	
 	return 1;
@@ -406,23 +426,18 @@ int multijetExtractorAnalysis::FirstJetSel()
 
 int multijetExtractorAnalysis::JetSel1()
 {
-	int n_jet = m_jetMet->getSize();
+	int n_jet = m_goodJetsIndex.size();
 	int isOK = 0;
-	int n_goodjet = 0;
 	int n_validgoodjet = 0;
 
 	if(n_jet != 0) {
-		n_goodjet = getNgoodJets() ;
-		if(n_goodjet >= m_JETS_Number_min) {
-			for(int i=0; i<m_JETS_Number_min; i++) {//at least m_JETS_Number_min good jets with pt > m_JETS_Pt_min GeV and |eta| < m_JETS_Eta_max
-			TLorentzVector *jetP = m_jetMet->getP4(i);
-				if(fabs(jetP->Pt()) > m_JETS_Pt_min && fabs(jetP->Eta()) < m_JETS_Eta_max) {	
-					n_validgoodjet = n_validgoodjet + 1;
-				}
+		for(int i=0; i<n_jet; i++) {//at least m_JETS_Number_min good jets with pt > m_JETS_Pt_min GeV and |eta| < m_JETS_Eta_max
+			TLorentzVector *jetP = m_jetMet->getP4(m_goodJetsIndex.at(i));
+			if(fabs(jetP->Pt()) > m_JETS_Pt_min && fabs(jetP->Eta()) < m_JETS_Eta_max && m_jet_isPFJetLoose[m_goodJetsIndex.at(i)] == 1) {	
+				n_validgoodjet = n_validgoodjet + 1;
 			}
-			if(n_validgoodjet >= m_JETS_Number_min) isOK = 1;
-			else isOK = 0;
 		}
+		if(n_validgoodjet >= m_JETS_Number_min) isOK = 1;
 		else isOK = 0;
 	}
 	else isOK=0;
@@ -432,20 +447,14 @@ int multijetExtractorAnalysis::JetSel1()
 
 int multijetExtractorAnalysis::JetSel2()
 {
-	int n_jet = m_jetMet->getSize();
+	int n_jet = m_goodJetsIndex.size();
 	int isOK = 0;
 	int n_fakejet = 0;
 	
-// 	if(n_jet != 0) {
-// 		float n_jet_pt30 = CountJetsPt30();
-// 		if(n_jet_pt30 == n_jet)	
-// 			isOK = 1;
-// 	}
-
 	if(n_jet != 0) {
 		for(int i=0; i<n_jet; i++) {
-			if(fabs(m_jetMet->getP4(i)->Pt()) > 20.) {
-				if(m_jet_isPFJetLoose[i] == 0) {
+			if(fabs(m_jetMet->getP4(m_goodJetsIndex.at(i))->Pt()) > 20.) {
+				if(m_jet_isPFJetLoose[m_goodJetsIndex.at(i)] == 0) {
 					n_fakejet = n_fakejet + 1;
 				}			
 			}
@@ -631,17 +640,16 @@ int multijetExtractorAnalysis::VertexSel()
 TLorentzVector multijetExtractorAnalysis::getRecoilLorentzVector()
 {
 	TLorentzVector recoil;
-	int n_jet = m_jetMet->getSize();
+	int n_jet = m_goodJetsIndex.size();
 	
 	if (! n_jet)
 		recoil = TLorentzVector(0.,0.,0.,0.);
 	else {
 		for (int i = 1; i < n_jet; i++)
 		{
-			TLorentzVector *jetP = m_jetMet->getP4(i);
-			if(1) { //put here the condition on the PU jet ID
-				recoil += *jetP;
-			}
+			TLorentzVector *jetP = m_jetMet->getP4(m_goodJetsIndex.at(i));
+			recoil += *jetP;
+
 		}
 	}
 	
@@ -654,11 +662,11 @@ TLorentzVector multijetExtractorAnalysis::getRecoilLorentzVector()
 int multijetExtractorAnalysis::SecondJetSel(TLorentzVector recoil)
 {
 	int isOK = 0;
-	int n_jet = m_jetMet->getSize();
+	int n_jet = m_goodJetsIndex.size();
 		
 	if(n_jet != 0) {
 		float ptRecoil = recoil.Pt();
-		float secondjetpt = m_jetMet->getP4(1)->Pt();
+		float secondjetpt = m_jetMet->getP4(m_goodJetsIndex.at(1))->Pt();
 		float A = fabs(secondjetpt)/fabs(ptRecoil);
 		if(secondjetpt<m_JET2_Pt_max && A < m_JET2_A_max)
 			isOK = 1;
@@ -669,7 +677,7 @@ int multijetExtractorAnalysis::SecondJetSel(TLorentzVector recoil)
 float multijetExtractorAnalysis::computeAlpha(TLorentzVector recoil)
 {
 	float phiRecoil = recoil.Phi();
-	float phiJet1 = m_jetMet->getP4(0)->Phi();
+	float phiJet1 = m_jetMet->getP4(m_goodJetsIndex.at(0))->Phi();
 	float deltaPhi = computeDeltaPhi(phiRecoil, phiJet1);
 		
 	float alpha =  TMath::Abs(deltaPhi - TMath::Pi());
@@ -680,7 +688,7 @@ float multijetExtractorAnalysis::computeAlpha(TLorentzVector recoil)
 int multijetExtractorAnalysis::AlphaSel(TLorentzVector recoil)
 {
 	int isOK = 0;
-	int n_jet = m_jetMet->getSize();
+	int n_jet = m_goodJetsIndex.size();
 		
 	if (n_jet != 0) {
 		float alpha =  computeAlpha(recoil);
@@ -701,12 +709,12 @@ float multijetExtractorAnalysis::computeBeta(int n_jet)
 	//if(n_jet != 0) {
 	if(n_jet > 1) {//we need at least 2 jets to compute a deltaPhi
 		//int indexClosestJet = 1;
-		float phiJet1 = m_jetMet->getP4(0)->Phi();
-		float phiJet2 = m_jetMet->getP4(1)->Phi();
+		float phiJet1 = m_jetMet->getP4(m_goodJetsIndex.at(0))->Phi();
+		float phiJet2 = m_jetMet->getP4(m_goodJetsIndex.at(1))->Phi();
 		beta = computeDeltaPhi(phiJet1, phiJet2);
 	
 		for (int i = 1; i < n_jet; i++) {
-			TLorentzVector *jetP = m_jetMet->getP4(i);
+			TLorentzVector *jetP = m_jetMet->getP4(m_goodJetsIndex.at(i));
 			float phiJet_tmp = jetP->Phi();
 			float deltaPhi_tmp = computeDeltaPhi(phiJet1, phiJet_tmp);
 			if(deltaPhi_tmp<beta) {
@@ -721,7 +729,7 @@ float multijetExtractorAnalysis::computeBeta(int n_jet)
 int multijetExtractorAnalysis::BetaSel()
 {
 	int isOK = 0;
-	int n_jet = m_jetMet->getSize();
+	int n_jet = m_goodJetsIndex.size();
 
 	//if(n_jet != 0) {
 	if(n_jet > 1) {//we need at least 2 jets to compute a deltaPhi
@@ -775,32 +783,48 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 	m_jetMet   = std::static_pointer_cast<JetMETExtractor>(extractor.getExtractor("JetMET"));
 	m_photon   = std::static_pointer_cast<PhotonExtractor>(extractor.getExtractor("photons"));
 	m_vertex   = std::static_pointer_cast<VertexExtractor>(extractor.getExtractor("vertex"));
-	
-	m_HT = computeHT();
-	
-	//m_met = m_jetMet->getMETLorentzVector(0)->Pt();
-	new((*m_met_lorentzvector)[0]) TLorentzVector(*(m_jetMet->getMETLorentzVector(0)));
 
-	
+	new((*m_met_lorentzvector)[0]) TLorentzVector(*(m_jetMet->getMETLorentzVector(0)));		
 
-	m_n_jets = m_jetMet->getSize();
-	m_n_jets_puLoose = CountJetsPuLoose();
+	m_n_totJets = m_jetMet->getSize();
 	
-	if(m_n_jets == 0) {
+	if(m_n_totJets == 0) {
 		fillTree();
     		return; 
 	}
-
-	if(m_n_jets != 0) {
-	  for(int i=0; i<m_n_jets; i++) {
+	
+	if(m_n_totJets != 0) {
+	  for(int i=0; i<m_n_totJets; i++) {
 	    m_jet_isPFJetLoose[i] =  m_jetMet->isPFJetLoose(i);
 	    m_jet_puJetId[i]      =  m_jetMet->getPuJetId(i);
 	  }
 	}
 	
+	m_goodJetsIndex = getGoodJetsIndex();
+	m_n_goodJets = m_goodJetsIndex.size();	
+	
+	if(m_n_goodJets == 0) {
+		fillTree();
+    		return; 
+	}
+	
+	
+	if(m_removePUJets) {
+		if(m_jet_puJetId[0] == 1) {
+			fillTree();
+    			return; 
+		}	
+	}
+	
+	m_HT = computeHT();
+
+
+	
+	m_n_puLooseJets = CountJetsPuLoose();
 	m_n_jets_pt30 = CountJetsPt30();
-	m_n_muons = m_muon->getSize();
-	m_n_goodJets = getNgoodJets() ;
+	m_n_PFLooseJets = getN_PFJets() ;	
+	
+	m_n_muons = m_muon->getSize();	
 	m_n_photons = m_photon->getSize();
 	
 	if(m_n_muons != 0) {
@@ -831,30 +855,29 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 
 	TLorentzVector recoil = getRecoilLorentzVector();
 	
-	new((*m_leadingjet_lorentzvector)[0]) TLorentzVector(*(m_jetMet->getP4(0)));
-	new((*m_leadingjetgen_lorentzvector)[0]) TLorentzVector(*(m_jetMet->getGenP4(0)));
+	new((*m_leadingjet_lorentzvector)[0]) TLorentzVector(*(m_jetMet->getP4(m_goodJetsIndex.at(0))));
+	new((*m_leadingjetgen_lorentzvector)[0]) TLorentzVector(*(m_jetMet->getGenP4(m_goodJetsIndex.at(0))));
 	
 	m_n_jets_recoil = 0;
-	for (int i = 1; i < m_n_jets; i++)
+	for (int i = 1; i < m_n_goodJets; i++)
 	{
-		TLorentzVector *jetP = m_jetMet->getP4(i);
-		TLorentzVector *jetgenP = m_jetMet->getGenP4(i);
-		if(1) { //put here the condition on the PU jet ID
-			new((*m_jets_recoil_lorentzvector)[m_n_jets_recoil]) TLorentzVector(*jetP);
-			new((*m_jetsgen_recoil_lorentzvector)[m_n_jets_recoil]) TLorentzVector(*jetgenP);
-			m_n_jets_recoil ++;
-		}
+		TLorentzVector *jetP = m_jetMet->getP4(m_goodJetsIndex.at(i));
+		TLorentzVector *jetgenP = m_jetMet->getGenP4(m_goodJetsIndex.at(i));
+		new((*m_jets_recoil_lorentzvector)[m_n_jets_recoil]) TLorentzVector(*jetP);
+		new((*m_jetsgen_recoil_lorentzvector)[m_n_jets_recoil]) TLorentzVector(*jetgenP);
+		m_n_jets_recoil ++;
 	}
 	new((*m_recoil_lorentzvector)[0]) TLorentzVector(recoil);
 	
-	if (m_jetMet->getP4(1)) {
-		m_secondjetpt = m_jetMet->getP4(1)->Pt();
+	if (m_jets_recoil_lorentzvector->At(0)) {
+		m_secondjetpt = ((TLorentzVector*)m_jets_recoil_lorentzvector->At(0))->Pt();
 	}
 	m_alpha = computeAlpha(recoil);
-	m_beta = computeBeta(m_n_jets);	
+	m_beta = computeBeta(m_n_goodJets);	
 	float ptrecoil = ((TLorentzVector*) (m_recoil_lorentzvector->At(0)))->Pt();
 	float leadingjetpt = ((TLorentzVector*) (m_leadingjet_lorentzvector->At(0)))->Pt();
-	m_A = fabs(m_secondjetpt)/fabs(ptrecoil);
+	m_A = fabs(m_secondjetpt)/fabs(ptrecoil);	
+
 	
 	int res = ElectronSel();
 	CHECK_RES_AND_RETURN(res, m_pass_electron_cut);
@@ -866,9 +889,7 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 	CHECK_RES_AND_RETURN(res, m_pass_Jet_cut1);
 	
 	res = JetSel2();
-	CHECK_RES_AND_RETURN(res, m_pass_Jet_cut2);
-	
-	
+	CHECK_RES_AND_RETURN(res, m_pass_Jet_cut2);	
 	
 	res = RecoilSel(recoil);
 	CHECK_RES_AND_RETURN(res, m_pass_recoil_cut);
@@ -903,9 +924,11 @@ void multijetExtractorAnalysis::fillTree()
 
 void multijetExtractorAnalysis::reset()
 {
-  m_n_jets               	 = -1;
-  m_n_jets_puLoose             	 = -1;
+  m_goodJetsIndex.clear();
+  m_n_totJets               	 = -1;
   m_n_goodJets               	 = -1;
+  m_n_puLooseJets             	 = -1;
+  m_n_PFLooseJets               	 = -1;
   m_n_muons               	 = -1;
   m_n_muons_loose = -1;
   m_n_muons_soft = -1;

@@ -34,6 +34,7 @@ class multijetExtractorAnalysis: public patextractor::Plugin {
 		virtual void analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup, PatExtractor& extractor);		
 		virtual void analyze(const edm::EventSetup& iSetup, PatExtractor& extractor);
 		void fillTree();
+		std::vector<int> getGoodJetsIndex();
 		void reset();
 		float computeHT();
 		float GetMJB(float ptLeading, float ptRecoil);
@@ -47,15 +48,17 @@ class multijetExtractorAnalysis: public patextractor::Plugin {
 		int CountMuonsTight(int n_muons);
 		int CountMuonsHighPt(int n_muons);
 		TLorentzVector getRecoilLorentzVector();
-		int getNgoodJets();
+		int getN_PFJets();
 		float computeAlpha(TLorentzVector recoil);
 		float computeBeta(int n_jet);
 	
 	private:
+	        std::vector<int> m_goodJetsIndex;
 		TTree*  m_tree_Multijet;
-		int m_n_jets;
-		int m_n_jets_puLoose;
+		int m_n_totJets;
 		int m_n_goodJets;
+		int m_n_puLooseJets;
+		int m_n_PFLooseJets;
 		int m_n_muons;
 		int m_n_muons_loose;
 		int m_n_muons_soft;
