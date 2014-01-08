@@ -147,7 +147,7 @@ std::vector<int> multijetExtractorAnalysis::getGoodJetsIndex() {
 	if (n_jet > 0) {
 		for(int i=0; i<n_jet; i++) {
 			if(m_removePUJets) {
-				if(!(m_jet_puJetId[i] == 1)) {
+				if(m_jet_puJetId[i] == 6 || m_jet_puJetId[i] == 7) {
 					myVector.push_back(i);
 				}
 			}
@@ -496,7 +496,7 @@ int multijetExtractorAnalysis::CountJetsPuLoose()
 	if(n_jet != 0) {	
 		for (int i = 0; i < n_jet; i++)
 		{
-			if(m_jetMet->getPuJetId(i) == 1) 
+			if(m_jetMet->getPuJetFullId(i) < 6) 
 			{
 				n_jet_puLoose = n_jet_puLoose + 1;
 			}		
@@ -796,7 +796,7 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 	if(m_n_totJets != 0) {
 	  for(int i=0; i<m_n_totJets; i++) {
 	    m_jet_isPFJetLoose[i] =  m_jetMet->isPFJetLoose(i);
-	    m_jet_puJetId[i]      =  m_jetMet->getPuJetId(i);
+	    m_jet_puJetId[i]      =  m_jetMet->getPuJetFullId(i);
 	  }
 	}
 	
@@ -810,7 +810,7 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 	
 	
 	if(m_removePUJets) {
-		if(m_jet_puJetId[0] == 1) {
+		if(m_jet_puJetId[0] < 6) {
 			fillTree();
     			return; 
 		}	
