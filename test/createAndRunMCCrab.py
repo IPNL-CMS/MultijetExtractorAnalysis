@@ -17,6 +17,20 @@ if options.run:
 
 datasets = [
     # Multijet analysis
+#    ["/QCD_Pt-1000to1400_TuneZ2star_8TeV_pythia6/apequegn-QCD_Pt-1000to1400_pythia_START53_V7A_20Dec13-v1-c5f9c59e100f883a59cec8d8908af608/USER", "QCD_Pt-1000to1400_pythia"],
+#    ["/QCD_Pt-1000_CTEQ6L1_8TeV_herwig6/apequegn-QCD_Pt-1000toInf_herwig_START53_V7C_22Dec13-v1-c5f9c59e100f883a59cec8d8908af608/USER", "QCD_Pt-1000toInf_herwig"],
+#    ["/QCD_Pt-120to170_TuneZ2star_8TeV_pythia6/apequegn-QCD_Pt-120to170_pythia_START53_V7A_20Dec13-v1-c5f9c59e100f883a59cec8d8908af608/USER", "QCD_Pt-120to170_pythia"],
+#    ["/QCD_Pt_120to170_CTEQ6L1_8TeV_herwig6/apequegn-QCD_Pt-120to170_herwig_START53_V7A_20Dec13-v1-c5f9c59e100f883a59cec8d8908af608/USER", "QCD_Pt-120to170_herwig"],
+#    ["/QCD_Pt-300to470_CTEQ6L1_8TeV_herwig6/apequegn-QCD_Pt-300to470_herwig_START53_V7C_22Dec13-v1-c5f9c59e100f883a59cec8d8908af608/USER", "QCD_Pt-300to470_herwig"],
+#    ["/QCD_Pt-300to470_TuneZ2star_8TeV_pythia6/apequegn-QCD_Pt-300to470_pythia_START53_V7A_20Dec13-v1-c5f9c59e100f883a59cec8d8908af608/USER", "QCD_Pt-300to470_pythia"],
+#    ["/QCD_Pt-170to300_TuneZ2star_8TeV_pythia6/apequegn-QCD_Pt-170to300_pythia_START53_V7A_20Dec13-v1-c5f9c59e100f883a59cec8d8908af608/USER", "QCD_Pt-170to300_pythia"],
+#    ["/QCD_Pt_170to300_CTEQ6L1_8TeV_herwig6/apequegn-QCD_Pt-170to300_herwig_START53_V7A_20Dec13-v1-c5f9c59e100f883a59cec8d8908af608/USER", "QCD_Pt-170to300_herwig"],
+#    ["/QCD_Pt-470to600_TuneZ2star_8TeV_pythia6/apequegn-QCD_Pt-470to600_pythia_START53_V7A_20Dec13-v1-c5f9c59e100f883a59cec8d8908af608/USER", "QCD_Pt-470to600_pythia"],
+#    ["/QCD_Pt-600to800_CTEQ6L1_8TeV_herwig6/apequegn-QCD_Pt-600to800_herwig_START53_V7C_22Dec13-v1-c5f9c59e100f883a59cec8d8908af608/USER", "QCD_Pt-600to800_herwig"],
+#    ["/QCD_Pt-600to800_TuneZ2star_8TeV_pythia6/apequegn-QCD_Pt-600to800_pythia_START53_V7A_20Dec13-v1-c5f9c59e100f883a59cec8d8908af608/USER", "QCD_Pt-600to800_pythia"],
+#    ["/QCD_Pt-470to600_CTEQ6L1_8TeV_herwig6/apequegn-QCD_Pt-470to600_herwig_START53_V7C_22Dec13-v1-c5f9c59e100f883a59cec8d8908af608/USER", "QCD_Pt-470to600_herwig"],
+#    ["/QCD_Pt-800to1000_TuneZ2star_8TeV_pythia6/apequegn-QCD_Pt-800to1000_pythia_START53_V7A_20Dec13-v1-c5f9c59e100f883a59cec8d8908af608/USER", "QCD_Pt-800to1000_pythia"],
+#    ["/QCD_Pt-800to1000_CTEQ6L1_8TeV_herwig6/apequegn-QCD_Pt-800to1000_herwig_START53_V7C_22Dec13-v1-c5f9c59e100f883a59cec8d8908af608/USER", "QCD_Pt-800to1000_herwig"],
     ["/QCD_HT-1000ToInf_TuneZ2star_8TeV-madgraph-pythia6/apequegn-QCD_HT-1000ToInf_START53_V7A_04Dec13-v1-869f7bc494a6202e5b9ae91c5af1c97d/USER", "QCD_HT-1000ToInf"],
     ["/QCD_HT-500To1000_TuneZ2star_8TeV-madgraph-pythia6/apequegn-QCD_HT-500To1000_START53_V7A_04Dec13-v1-869f7bc494a6202e5b9ae91c5af1c97d/USER ", "QCD_HT-500To1000"]
     
@@ -34,7 +48,7 @@ print("")
 
 for dataset in datasets:
 
-  dataset_name = dataset[1]
+  dataset_name = dataset[1] + "_woPU_pt40_eta50"
   dataset_path = dataset[0]
   dataset_size = -1
   if len(dataset) > 2:

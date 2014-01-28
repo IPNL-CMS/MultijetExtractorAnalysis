@@ -19,7 +19,7 @@ crabFolders = [name for name in os.listdir(options.path) if os.path.isdir(os.pat
 for crabFolder in crabFolders:
   dataset = crabFolder.rstrip("/").replace("crab_data_", "")
   print("Processing %s" % dataset)
-  outputName = "MTT_%s.list" % (dataset)
+  outputName = "MULTIJET_%s.list" % (dataset)
   fullPath = "%s/%s" % (options.path, crabFolder)
   if os.path.exists(outputName):
     print("'%s' already exists. Skipping." % outputName)

@@ -108,6 +108,9 @@ class multijetExtractorAnalysis: public patextractor::Plugin {
 		float m_JETS_Pt_min;
 		float m_JETS_Eta_max;
 		
+		float m_RECOILJETS_Pt_min;
+		float m_RECOILJETS_Eta_max;
+		
 		//float m_VERTEX_Number_min;
 		float m_VERTEX_Tracks_min;
 		

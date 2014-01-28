@@ -16,7 +16,7 @@ total_number_of_events = -1
 events_per_job = 400000
 
 ### The output files produced by your application (comma separated list)
-output_file = extracted.root
+output_file = extracted_mc.root
 
 [USER]
 

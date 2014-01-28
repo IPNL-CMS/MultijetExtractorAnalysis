@@ -110,6 +110,10 @@ multijetExtractorAnalysis::multijetExtractorAnalysis(const edm::ParameterSet& cm
   m_JETS_Pt_min = cmsswSettings.getParameter<edm::ParameterSet>("jet").getParameter<double>("pt_min");
   m_JETS_Eta_max = cmsswSettings.getParameter<edm::ParameterSet>("jet").getParameter<double>("eta_max");
   
+  //Recoil jets	
+  m_RECOILJETS_Pt_min = cmsswSettings.getParameter<edm::ParameterSet>("recoilJets").getParameter<double>("pt_min");
+  m_RECOILJETS_Eta_max = cmsswSettings.getParameter<edm::ParameterSet>("recoilJets").getParameter<double>("eta_max");
+  
   //VertexSel()	
   //m_VERTEX_Number_min = cmsswSettings.getParameter<edm::ParameterSet>("vertex").getParameter<double>("number_min");
   m_VERTEX_Tracks_min = cmsswSettings.getParameter<edm::ParameterSet>("vertex").getParameter<double>("tracks_min");
@@ -648,7 +652,9 @@ TLorentzVector multijetExtractorAnalysis::getRecoilLorentzVector()
 		for (int i = 1; i < n_jet; i++)
 		{
 			TLorentzVector *jetP = m_jetMet->getP4(m_goodJetsIndex.at(i));
-			recoil += *jetP;
+			if(jetP->Pt() > m_RECOILJETS_Pt_min && fabs(jetP->Eta()) < m_RECOILJETS_Eta_max) {				
+				recoil += *jetP;
+			}
 
 		}
 	}
@@ -863,9 +869,11 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 	{
 		TLorentzVector *jetP = m_jetMet->getP4(m_goodJetsIndex.at(i));
 		TLorentzVector *jetgenP = m_jetMet->getGenP4(m_goodJetsIndex.at(i));
-		new((*m_jets_recoil_lorentzvector)[m_n_jets_recoil]) TLorentzVector(*jetP);
-		new((*m_jetsgen_recoil_lorentzvector)[m_n_jets_recoil]) TLorentzVector(*jetgenP);
-		m_n_jets_recoil ++;
+		if(jetP->Pt() > m_RECOILJETS_Pt_min && fabs(jetP->Eta()) < m_RECOILJETS_Eta_max) {				
+			new((*m_jets_recoil_lorentzvector)[m_n_jets_recoil]) TLorentzVector(*jetP);
+			new((*m_jetsgen_recoil_lorentzvector)[m_n_jets_recoil]) TLorentzVector(*jetgenP);
+			m_n_jets_recoil ++;
+		}
 	}
 	new((*m_recoil_lorentzvector)[0]) TLorentzVector(recoil);
 	

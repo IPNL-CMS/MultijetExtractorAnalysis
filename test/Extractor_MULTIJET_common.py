@@ -81,11 +81,8 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
   process.PATextraction.vtx_tag    = cms.InputTag( "goodOfflinePrimaryVertices" )
   process.PATextraction.doHLT      = True
 
-#  if not isMC:
-#    if isSemiMu:
-#      process.PATextraction.triggersXML = readFile("triggers_mu.xml")
-#    else:
-#      process.PATextraction.triggersXML = readFile("triggers_e.xml")
+  if not isMC:
+    process.PATextraction.triggersXML = readFile("triggers.xml")
 
   # Jets correction : needs a valid global tags, or an external DB where JEC are stored
   process.PATextraction.jet_PF.redoJetCorrection = True
@@ -105,7 +102,7 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
   # JES systematics:
   # Use -1 for 1-sigma down, 0 for nominal correction, and 1 for 1-sigma up
   process.PATextraction.jet_PF.jesSign = 0
-  process.PATextraction.jet_PF.jes_uncertainties_file = cms.untracked.string("Extractors/PatExtractor/data/START53_V23_Uncertainty_AK5PFchs.txt")
+  process.PATextraction.jet_PF.jes_uncertainties_file = cms.untracked.string("")
 
   process.PATextraction.MET_PF.redoMetPhiCorrection   = True
   process.PATextraction.MET_PF.redoMetTypeICorrection = False # Automatically true if redoJetCorrection is True
@@ -114,6 +111,10 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
   # Multijet analysis configuration
   process.PATextraction.plugins = cms.PSet(
     multijetExtractorAnalysis = cms.PSet(
+      PUJets = cms.PSet(
+	removePUJets = cms.bool(True)
+	),
+    
       firstJet = cms.PSet(
 	eta_max = cms.double(1.3)
 	),
@@ -122,6 +123,11 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
 	pt_min = cms.double(25),
 	eta_max = cms.double(2.8),
 	number_min = cms.double(3)
+	),
+
+      recoilJets = cms.PSet(
+	pt_min = cms.double(40.),
+	eta_max = cms.double(5.0),
 	),
 	
       vertex = cms.PSet(
@@ -155,7 +161,9 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
 	)
 	
       ) 
+
       )
+
 
 
   #########################################
