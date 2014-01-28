@@ -1,0 +1,13 @@
+*.pyc
+*.cfg
+*crab_data*
+*crab_MC*
+*.list
+*.root
+*/
+!/configs
+crab.history
+libshift.so
+libshift.so.2.1
+triggers.xml
+
