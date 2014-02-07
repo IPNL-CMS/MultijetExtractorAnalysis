@@ -5,6 +5,7 @@ use_server = 0
 
 [CMSSW]
 
+allow_NonProductionCMSSW = 1
 dbs_url = http://cmsdbsprod.cern.ch/cms_dbs_ph_analysis_02/servlet/DBSServlet
 datasetpath = @datasetname@
 
