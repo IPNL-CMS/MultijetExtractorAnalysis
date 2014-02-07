@@ -151,7 +151,7 @@ std::vector<int> multijetExtractorAnalysis::getGoodJetsIndex() {
 	if (n_jet > 0) {
 		for(int i=0; i<n_jet; i++) {
 			if(m_removePUJets) {
-				if(m_jet_puJetId[i] == 6 || m_jet_puJetId[i] == 7) {
+				if(m_jet_puJetId[i] == 7) {
 					myVector.push_back(i);
 				}
 			}
@@ -816,7 +816,7 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 	
 	
 	if(m_removePUJets) {
-		if(m_jet_puJetId[0] < 6) {
+		if(m_jet_puJetId[0] < 7) {
 			fillTree();
     			return; 
 		}	

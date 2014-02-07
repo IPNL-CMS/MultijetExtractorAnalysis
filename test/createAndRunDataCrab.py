@@ -26,7 +26,7 @@ print("")
 
 for dataset in datasets:
   dataset_path = dataset[0]
-  dataset_name = dataset[1]  + "_woPU_pt40_eta50"
+  dataset_name = dataset[1]  + "_woPU_pt25_eta50_PUtightOnly"
   dataset_globaltag = dataset[2]
 
   ui_working_dir = ("crab_data_%s_%s") % (dataset_name, d)

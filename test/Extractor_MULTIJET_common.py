@@ -126,7 +126,7 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
 	),
 
       recoilJets = cms.PSet(
-	pt_min = cms.double(40.),
+	pt_min = cms.double(25.),
 	eta_max = cms.double(5.0),
 	),
 	

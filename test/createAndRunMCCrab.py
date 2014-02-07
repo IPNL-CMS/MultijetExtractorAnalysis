@@ -48,7 +48,7 @@ print("")
 
 for dataset in datasets:
 
-  dataset_name = dataset[1] + "_woPU_pt40_eta50"
+  dataset_name = dataset[1] + "_woPU_pt25_eta50_PUtightOnly"
   dataset_path = dataset[0]
   dataset_size = -1
   if len(dataset) > 2:
