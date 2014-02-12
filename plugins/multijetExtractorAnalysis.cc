@@ -23,6 +23,7 @@ multijetExtractorAnalysis::multijetExtractorAnalysis(const edm::ParameterSet& cm
   m_recoil_lorentzvector = new TClonesArray("TLorentzVector");
   m_leadingjet_lorentzvector = new TClonesArray("TLorentzVector");
   m_leadingjetgen_lorentzvector = new TClonesArray("TLorentzVector");
+  m_leadingjetraw_lorentzvector = new TClonesArray("TLorentzVector");
   m_jets_recoil_lorentzvector = new TClonesArray("TLorentzVector");
   m_jetsgen_recoil_lorentzvector = new TClonesArray("TLorentzVector");
   
@@ -88,6 +89,7 @@ multijetExtractorAnalysis::multijetExtractorAnalysis(const edm::ParameterSet& cm
   m_tree_Multijet->Branch("met_4vector","TClonesArray",&m_met_lorentzvector, 1000, 0);
   m_tree_Multijet->Branch("leadingjet_4vector","TClonesArray",&m_leadingjet_lorentzvector, 5000, 0);
   m_tree_Multijet->Branch("leadingjetgen_4vector","TClonesArray",&m_leadingjetgen_lorentzvector, 5000, 0);
+  m_tree_Multijet->Branch("leadingjetraw_4vector","TClonesArray",&m_leadingjetraw_lorentzvector, 5000, 0);
   m_tree_Multijet->Branch("recoil_4vector","TClonesArray",&m_recoil_lorentzvector, 5000, 0);
   m_tree_Multijet->Branch("n_jets_recoil", &m_n_jets_recoil, "n_jets_recoil/I");
   m_tree_Multijet->Branch("jets_recoil_4vector","TClonesArray",&m_jets_recoil_lorentzvector, 5000, 0);
@@ -863,6 +865,7 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 	
 	new((*m_leadingjet_lorentzvector)[0]) TLorentzVector(*(m_jetMet->getP4(m_goodJetsIndex.at(0))));
 	new((*m_leadingjetgen_lorentzvector)[0]) TLorentzVector(*(m_jetMet->getGenP4(m_goodJetsIndex.at(0))));
+    new((*m_leadingjetraw_lorentzvector)[0]) TLorentzVector(*(m_jetMet->getRawP4(m_goodJetsIndex.at(0))));
 	
 	m_n_jets_recoil = 0;
 	for (int i = 1; i < m_n_goodJets; i++)
@@ -999,6 +1002,9 @@ void multijetExtractorAnalysis::reset()
     
   if (m_leadingjetgen_lorentzvector)
     m_leadingjetgen_lorentzvector->Clear();
+
+  if (m_leadingjetraw_lorentzvector)
+    m_leadingjetraw_lorentzvector->Clear();
     
   if (m_recoil_lorentzvector)
     m_recoil_lorentzvector->Clear();

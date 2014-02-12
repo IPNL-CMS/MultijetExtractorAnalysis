@@ -73,6 +73,7 @@ class multijetExtractorAnalysis: public patextractor::Plugin {
 		int m_n_jets_recoil;
 		TClonesArray* m_leadingjet_lorentzvector;
 		TClonesArray* m_leadingjetgen_lorentzvector;
+        TClonesArray* m_leadingjetraw_lorentzvector;
 		TClonesArray* m_recoil_lorentzvector;
 		TClonesArray* m_jets_recoil_lorentzvector;
 		TClonesArray* m_jetsgen_recoil_lorentzvector;
