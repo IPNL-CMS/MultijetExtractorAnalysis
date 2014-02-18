@@ -103,14 +103,10 @@ multijetExtractorAnalysis::multijetExtractorAnalysis(const edm::ParameterSet& cm
 
   //removePUJets(); 
   m_removePUJets = cmsswSettings.getParameter<edm::ParameterSet>("PUJets").getParameter<bool>("removePUJets");  
+  m_PUJets_Id_min = cmsswSettings.getParameter<edm::ParameterSet>("PUJets").getParameter<double>("id_min");
  
   //FirstJetSel(); 
   m_JET1_Eta_max = cmsswSettings.getParameter<edm::ParameterSet>("firstJet").getParameter<double>("eta_max");
-  
-  //JetSel()	
-  m_JETS_Number_min = cmsswSettings.getParameter<edm::ParameterSet>("jet").getParameter<double>("number_min");
-  m_JETS_Pt_min = cmsswSettings.getParameter<edm::ParameterSet>("jet").getParameter<double>("pt_min");
-  m_JETS_Eta_max = cmsswSettings.getParameter<edm::ParameterSet>("jet").getParameter<double>("eta_max");
   
   //Recoil jets	
   m_RECOILJETS_Pt_min = cmsswSettings.getParameter<edm::ParameterSet>("recoilJets").getParameter<double>("pt_min");
@@ -153,7 +149,7 @@ std::vector<int> multijetExtractorAnalysis::getGoodJetsIndex() {
 	if (n_jet > 0) {
 		for(int i=0; i<n_jet; i++) {
 			if(m_removePUJets) {
-				if(m_jet_puJetId[i] == 7) {
+				if(m_jet_puJetId[i] >= m_PUJets_Id_min) {
 					myVector.push_back(i);
 				}
 			}
@@ -174,7 +170,10 @@ float multijetExtractorAnalysis::computeHT()
 		return 0;
 	
 	for(int i=0; i<n_jet; i++) {
-		HT = HT + m_jetMet->getP4(m_goodJetsIndex.at(i))->Pt();
+   	TLorentzVector *jetP = m_jetMet->getP4(m_goodJetsIndex.at(i));
+    if(jetP->Pt() > m_RECOILJETS_Pt_min && fabs(jetP->Eta()) < m_RECOILJETS_Eta_max) {	
+      HT = HT + m_jetMet->getP4(m_goodJetsIndex.at(i))->Pt();
+    }
 	}
 	return HT;
 }
@@ -408,6 +407,7 @@ int multijetExtractorAnalysis::ElectronSel()
 
 int multijetExtractorAnalysis::RecoilSel(TLorentzVector recoil_p4)
 {
+  //not done anymore
 	int n_jet = m_goodJetsIndex.size();
 	
 	if (! n_jet)
@@ -421,6 +421,7 @@ int multijetExtractorAnalysis::RecoilSel(TLorentzVector recoil_p4)
 
 int multijetExtractorAnalysis::FirstJetSel()
 {
+  //done after Extractor
 	if (! m_goodJetsIndex.size())
 		return 0;
 
@@ -437,13 +438,13 @@ int multijetExtractorAnalysis::JetSel1()
 	int n_validgoodjet = 0;
 
 	if(n_jet != 0) {
-		for(int i=0; i<n_jet; i++) {//at least m_JETS_Number_min good jets with pt > m_JETS_Pt_min GeV and |eta| < m_JETS_Eta_max
+		for(int i=0; i<n_jet; i++) {//at least 3 good jets with pt > 25 GeV and |eta| < 2.8
 			TLorentzVector *jetP = m_jetMet->getP4(m_goodJetsIndex.at(i));
-			if(fabs(jetP->Pt()) > m_JETS_Pt_min && fabs(jetP->Eta()) < m_JETS_Eta_max && m_jet_isPFJetLoose[m_goodJetsIndex.at(i)] == 1) {	
+			if(fabs(jetP->Pt()) > 25. && fabs(jetP->Eta()) < 2.8 && m_jet_isPFJetLoose[m_goodJetsIndex.at(i)] == 1) {	
 				n_validgoodjet = n_validgoodjet + 1;
 			}
 		}
-		if(n_validgoodjet >= m_JETS_Number_min) isOK = 1;
+		if(n_validgoodjet >= 3) isOK = 1;
 		else isOK = 0;
 	}
 	else isOK=0;
@@ -669,6 +670,7 @@ TLorentzVector multijetExtractorAnalysis::getRecoilLorentzVector()
 
 int multijetExtractorAnalysis::SecondJetSel(TLorentzVector recoil)
 {
+  //done after Extractor
 	int isOK = 0;
 	int n_jet = m_goodJetsIndex.size();
 		
@@ -695,6 +697,7 @@ float multijetExtractorAnalysis::computeAlpha(TLorentzVector recoil)
 
 int multijetExtractorAnalysis::AlphaSel(TLorentzVector recoil)
 {
+  //done after Extractor
 	int isOK = 0;
 	int n_jet = m_goodJetsIndex.size();
 		
@@ -736,6 +739,7 @@ float multijetExtractorAnalysis::computeBeta(int n_jet)
 
 int multijetExtractorAnalysis::BetaSel()
 {
+  //done after Extractor
 	int isOK = 0;
 	int n_jet = m_goodJetsIndex.size();
 
@@ -818,7 +822,7 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 	
 	
 	if(m_removePUJets) {
-		if(m_jet_puJetId[0] < 7) {
+		if(m_jet_puJetId[0] < m_PUJets_Id_min) {
 			fillTree();
     			return; 
 		}	
@@ -878,14 +882,18 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 			m_n_jets_recoil ++;
 		}
 	}
-	new((*m_recoil_lorentzvector)[0]) TLorentzVector(recoil);
+  if(recoil.Pt())
+    new((*m_recoil_lorentzvector)[0]) TLorentzVector(recoil);
 	
 	if (m_jets_recoil_lorentzvector->At(0)) {
 		m_secondjetpt = ((TLorentzVector*)m_jets_recoil_lorentzvector->At(0))->Pt();
 	}
 	m_alpha = computeAlpha(recoil);
 	m_beta = computeBeta(m_n_goodJets);	
-	float ptrecoil = ((TLorentzVector*) (m_recoil_lorentzvector->At(0)))->Pt();
+  float ptrecoil = -1.;
+  if(m_recoil_lorentzvector->GetEntriesFast()) {
+	  ptrecoil = ((TLorentzVector*) (m_recoil_lorentzvector->At(0)))->Pt();
+  }
 	float leadingjetpt = ((TLorentzVector*) (m_leadingjet_lorentzvector->At(0)))->Pt();
 	m_A = fabs(m_secondjetpt)/fabs(ptrecoil);	
 
@@ -902,20 +910,22 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 	res = JetSel2();
 	CHECK_RES_AND_RETURN(res, m_pass_Jet_cut2);	
 	
-	res = RecoilSel(recoil);
-	CHECK_RES_AND_RETURN(res, m_pass_recoil_cut);
+  //not done anymore
+	//res = RecoilSel(recoil);
+	//CHECK_RES_AND_RETURN(res, m_pass_recoil_cut);
 
-	res = FirstJetSel();
-	CHECK_RES_AND_RETURN(res, m_pass_1stJet_cut);
+  //selections done after Extractor
+	//res = FirstJetSel();
+	//CHECK_RES_AND_RETURN(res, m_pass_1stJet_cut);
 	
-	res = SecondJetSel(recoil);
-	CHECK_RES_AND_RETURN(res, m_pass_2ndJet_cut);
+	//res = SecondJetSel(recoil);
+	//CHECK_RES_AND_RETURN(res, m_pass_2ndJet_cut);
 
-	res = AlphaSel(recoil);
-	CHECK_RES_AND_RETURN(res, m_pass_alpha_cut);
+	//res = AlphaSel(recoil);
+	//CHECK_RES_AND_RETURN(res, m_pass_alpha_cut);
 
-	res = BetaSel();
-	CHECK_RES_AND_RETURN(res, m_pass_beta_cut);
+	//res = BetaSel();
+	//CHECK_RES_AND_RETURN(res, m_pass_beta_cut);
 
 
 	m_multijet_isSel = 1;	

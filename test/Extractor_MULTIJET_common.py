@@ -112,17 +112,12 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
   process.PATextraction.plugins = cms.PSet(
     multijetExtractorAnalysis = cms.PSet(
       PUJets = cms.PSet(
-	removePUJets = cms.bool(True)
+	removePUJets = cms.bool(True),
+    id_min = cms.double(6)
 	),
     
       firstJet = cms.PSet(
 	eta_max = cms.double(1.3)
-	),
-	
-      jet = cms.PSet(
-	pt_min = cms.double(25),
-	eta_max = cms.double(2.8),
-	number_min = cms.double(3)
 	),
 
       recoilJets = cms.PSet(

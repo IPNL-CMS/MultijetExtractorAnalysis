@@ -101,13 +101,11 @@ class multijetExtractorAnalysis: public patextractor::Plugin {
 		
 		//config
 		bool m_removePUJets;
+        float m_PUJets_Id_min;
+
 		float m_MET_Pt_min;
 
 		float m_JET1_Eta_max;
-		
-		float m_JETS_Number_min;
-		float m_JETS_Pt_min;
-		float m_JETS_Eta_max;
 		
 		float m_RECOILJETS_Pt_min;
 		float m_RECOILJETS_Eta_max;
