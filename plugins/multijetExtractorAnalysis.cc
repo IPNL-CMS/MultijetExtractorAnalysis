@@ -20,11 +20,14 @@ multijetExtractorAnalysis::multijetExtractorAnalysis(const edm::ParameterSet& cm
  
    // Set everything to 0
   m_met_lorentzvector = new TClonesArray("TLorentzVector");
+  m_met_puSubstract_lorentzvector = new TClonesArray("TLorentzVector");
   m_recoil_lorentzvector = new TClonesArray("TLorentzVector");
+  m_pu_lorentzvector = new TClonesArray("TLorentzVector");
   m_leadingjet_lorentzvector = new TClonesArray("TLorentzVector");
   m_leadingjetgen_lorentzvector = new TClonesArray("TLorentzVector");
   m_leadingjetraw_lorentzvector = new TClonesArray("TLorentzVector");
   m_jets_recoil_lorentzvector = new TClonesArray("TLorentzVector");
+  m_jets_pu_lorentzvector = new TClonesArray("TLorentzVector");
   m_jetsgen_recoil_lorentzvector = new TClonesArray("TLorentzVector");
   
   //reset();
@@ -87,12 +90,15 @@ multijetExtractorAnalysis::multijetExtractorAnalysis(const edm::ParameterSet& cm
   
   //m_tree_Multijet->Branch("MET", &m_met, "MET/F");
   m_tree_Multijet->Branch("met_4vector","TClonesArray",&m_met_lorentzvector, 1000, 0);
+  m_tree_Multijet->Branch("met_puSubstract_4vector","TClonesArray",&m_met_puSubstract_lorentzvector, 1000, 0);
   m_tree_Multijet->Branch("leadingjet_4vector","TClonesArray",&m_leadingjet_lorentzvector, 5000, 0);
   m_tree_Multijet->Branch("leadingjetgen_4vector","TClonesArray",&m_leadingjetgen_lorentzvector, 5000, 0);
   m_tree_Multijet->Branch("leadingjetraw_4vector","TClonesArray",&m_leadingjetraw_lorentzvector, 5000, 0);
   m_tree_Multijet->Branch("recoil_4vector","TClonesArray",&m_recoil_lorentzvector, 5000, 0);
+  m_tree_Multijet->Branch("pu_4vector","TClonesArray",&m_pu_lorentzvector, 5000, 0);
   m_tree_Multijet->Branch("n_jets_recoil", &m_n_jets_recoil, "n_jets_recoil/I");
   m_tree_Multijet->Branch("jets_recoil_4vector","TClonesArray",&m_jets_recoil_lorentzvector, 5000, 0);
+  m_tree_Multijet->Branch("jets_pu_4vector","TClonesArray",&m_jets_pu_lorentzvector, 5000, 0);
   m_tree_Multijet->Branch("jetsgen_recoil_4vector","TClonesArray",&m_jetsgen_recoil_lorentzvector, 5000, 0);
   m_tree_Multijet->Branch("secondjetpt", &m_secondjetpt, "secondjetpt/F");
   m_tree_Multijet->Branch("alpha", &m_alpha, "alpha/F");
@@ -145,6 +151,9 @@ multijetExtractorAnalysis::~multijetExtractorAnalysis()
 std::vector<int> multijetExtractorAnalysis::getGoodJetsIndex() {
 	std::vector<int> myVector;
 	int n_jet = m_jetMet->getSize();
+
+
+  TLorentzVector pu;
 	
 	if (n_jet > 0) {
 		for(int i=0; i<n_jet; i++) {
@@ -152,12 +161,18 @@ std::vector<int> multijetExtractorAnalysis::getGoodJetsIndex() {
 				if(m_jet_puJetId[i] >= m_PUJets_Id_min) {
 					myVector.push_back(i);
 				}
+        else {
+          TLorentzVector *jetP = m_jetMet->getP4(i);	
+          pu += *jetP;
+		    	new((*m_jets_pu_lorentzvector)[i]) TLorentzVector(*jetP);       
+        }
 			}
 			else {
 				myVector.push_back(i);
 			}
 		}
 	}
+  new((*m_pu_lorentzvector)[0]) TLorentzVector(pu);
 	return myVector;
 }
 
@@ -668,6 +683,7 @@ TLorentzVector multijetExtractorAnalysis::getRecoilLorentzVector()
 
 
 
+
 int multijetExtractorAnalysis::SecondJetSel(TLorentzVector recoil)
 {
   //done after Extractor
@@ -830,6 +846,12 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 	
 	m_HT = computeHT();
 
+  TLorentzVector metCorr = *(m_jetMet->getMETLorentzVector(0));
+  TLorentzVector pu = *((TLorentzVector*)m_pu_lorentzvector->At(0));
+  metCorr.SetPx(metCorr.Px() + pu.Px());
+  metCorr.SetPy(metCorr.Py() + pu.Py());
+  metCorr.SetE(sqrt(metCorr.Py()*metCorr.Py() + metCorr.Px()*metCorr.Px()));
+  new((*m_met_puSubstract_lorentzvector)[0]) TLorentzVector(metCorr);
 
 	
 	m_n_puLooseJets = CountJetsPuLoose();
@@ -1018,15 +1040,24 @@ void multijetExtractorAnalysis::reset()
     
   if (m_recoil_lorentzvector)
     m_recoil_lorentzvector->Clear();
+
+  if (m_pu_lorentzvector)
+    m_pu_lorentzvector->Clear();
     
   if (m_jets_recoil_lorentzvector)
     m_jets_recoil_lorentzvector->Clear();
+
+  if (m_jets_pu_lorentzvector)
+    m_jets_pu_lorentzvector->Clear();
     
   if (m_jetsgen_recoil_lorentzvector)
     m_jetsgen_recoil_lorentzvector->Clear();
 
   if (m_met_lorentzvector)
     m_met_lorentzvector->Clear();
+
+  if (m_met_puSubstract_lorentzvector)
+    m_met_puSubstract_lorentzvector->Clear();
 }
 
 //}

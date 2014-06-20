@@ -71,12 +71,14 @@ class multijetExtractorAnalysis: public patextractor::Plugin {
 		int m_n_electrons;
 		int m_n_jets_pt30;
 		int m_n_jets_recoil;
-		TClonesArray* m_leadingjet_lorentzvector;
-		TClonesArray* m_leadingjetgen_lorentzvector;
-        TClonesArray* m_leadingjetraw_lorentzvector;
-		TClonesArray* m_recoil_lorentzvector;
-		TClonesArray* m_jets_recoil_lorentzvector;
-		TClonesArray* m_jetsgen_recoil_lorentzvector;
+    TClonesArray* m_leadingjet_lorentzvector;
+    TClonesArray* m_leadingjetgen_lorentzvector;
+    TClonesArray* m_leadingjetraw_lorentzvector;
+    TClonesArray* m_recoil_lorentzvector;
+    TClonesArray* m_pu_lorentzvector;
+    TClonesArray* m_jets_recoil_lorentzvector;
+    TClonesArray* m_jets_pu_lorentzvector;
+    TClonesArray* m_jetsgen_recoil_lorentzvector;
 		  
 		std::shared_ptr<MuonExtractor> m_muon;
 		  
@@ -94,6 +96,7 @@ class multijetExtractorAnalysis: public patextractor::Plugin {
 		
 		//float m_met;
 		TClonesArray* m_met_lorentzvector;
+		TClonesArray* m_met_puSubstract_lorentzvector;
 		float m_secondjetpt;
 		float m_alpha;
 		float m_beta;
