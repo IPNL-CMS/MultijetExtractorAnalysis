@@ -6,7 +6,8 @@ use_server = 0
 [CMSSW]
 
 allow_NonProductionCMSSW = 1
-dbs_url = http://cmsdbsprod.cern.ch/cms_dbs_ph_analysis_02/servlet/DBSServlet
+use_dbs3=1
+dbs_url = phys03
 datasetpath = @datasetname@
 
 pset = @pset@
