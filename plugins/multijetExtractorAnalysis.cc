@@ -20,8 +20,10 @@ multijetExtractorAnalysis::multijetExtractorAnalysis(const edm::ParameterSet& cm
  
    // Set everything to 0
   m_met_lorentzvector = new TClonesArray("TLorentzVector");
+  m_genmet_lorentzvector = new TClonesArray("TLorentzVector");
   m_met_puSubstract_lorentzvector = new TClonesArray("TLorentzVector");
   m_recoil_lorentzvector = new TClonesArray("TLorentzVector");
+  m_genrecoil_lorentzvector = new TClonesArray("TLorentzVector");
   m_pu_lorentzvector = new TClonesArray("TLorentzVector");
   m_leadingjet_lorentzvector = new TClonesArray("TLorentzVector");
   m_leadingjetgen_lorentzvector = new TClonesArray("TLorentzVector");
@@ -90,11 +92,13 @@ multijetExtractorAnalysis::multijetExtractorAnalysis(const edm::ParameterSet& cm
   
   //m_tree_Multijet->Branch("MET", &m_met, "MET/F");
   m_tree_Multijet->Branch("met_4vector","TClonesArray",&m_met_lorentzvector, 1000, 0);
+  m_tree_Multijet->Branch("genmet_4vector","TClonesArray",&m_genmet_lorentzvector, 1000, 0);
   m_tree_Multijet->Branch("met_puSubstract_4vector","TClonesArray",&m_met_puSubstract_lorentzvector, 1000, 0);
   m_tree_Multijet->Branch("leadingjet_4vector","TClonesArray",&m_leadingjet_lorentzvector, 5000, 0);
   m_tree_Multijet->Branch("leadingjetgen_4vector","TClonesArray",&m_leadingjetgen_lorentzvector, 5000, 0);
   m_tree_Multijet->Branch("leadingjetraw_4vector","TClonesArray",&m_leadingjetraw_lorentzvector, 5000, 0);
   m_tree_Multijet->Branch("recoil_4vector","TClonesArray",&m_recoil_lorentzvector, 5000, 0);
+  m_tree_Multijet->Branch("genrecoil_4vector","TClonesArray",&m_genrecoil_lorentzvector, 5000, 0);
   m_tree_Multijet->Branch("pu_4vector","TClonesArray",&m_pu_lorentzvector, 5000, 0);
   m_tree_Multijet->Branch("n_jets_recoil", &m_n_jets_recoil, "n_jets_recoil/I");
   m_tree_Multijet->Branch("jets_recoil_4vector","TClonesArray",&m_jets_recoil_lorentzvector, 5000, 0);
@@ -813,6 +817,7 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 	m_vertex   = std::static_pointer_cast<VertexExtractor>(extractor.getExtractor("vertex"));
 
 	new((*m_met_lorentzvector)[0]) TLorentzVector(*(m_jetMet->getMETLorentzVector(0)));		
+	new((*m_genmet_lorentzvector)[0]) TLorentzVector(*(m_jetMet->getGenMETLorentzVector(0)));		
 
 	m_n_totJets = m_jetMet->getSize();
 	
@@ -888,6 +893,7 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 	}
 
 	TLorentzVector recoil = getRecoilLorentzVector();
+  TLorentzVector genrecoil;
 	
 	new((*m_leadingjet_lorentzvector)[0]) TLorentzVector(*(m_jetMet->getP4(m_goodJetsIndex.at(0))));
 	new((*m_leadingjetgen_lorentzvector)[0]) TLorentzVector(*(m_jetMet->getGenP4(m_goodJetsIndex.at(0))));
@@ -902,10 +908,15 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 			new((*m_jets_recoil_lorentzvector)[m_n_jets_recoil]) TLorentzVector(*jetP);
 			new((*m_jetsgen_recoil_lorentzvector)[m_n_jets_recoil]) TLorentzVector(*jetgenP);
 			m_n_jets_recoil ++;
+      genrecoil += *jetgenP;
 		}
 	}
+
   if(recoil.Pt())
     new((*m_recoil_lorentzvector)[0]) TLorentzVector(recoil);
+
+  if(genrecoil.Pt())
+    new((*m_genrecoil_lorentzvector)[0]) TLorentzVector(genrecoil);
 	
 	if (m_jets_recoil_lorentzvector->At(0)) {
 		m_secondjetpt = ((TLorentzVector*)m_jets_recoil_lorentzvector->At(0))->Pt();
@@ -1041,6 +1052,9 @@ void multijetExtractorAnalysis::reset()
   if (m_recoil_lorentzvector)
     m_recoil_lorentzvector->Clear();
 
+  if (m_genrecoil_lorentzvector)
+    m_genrecoil_lorentzvector->Clear();
+
   if (m_pu_lorentzvector)
     m_pu_lorentzvector->Clear();
     
@@ -1055,6 +1069,9 @@ void multijetExtractorAnalysis::reset()
 
   if (m_met_lorentzvector)
     m_met_lorentzvector->Clear();
+
+  if (m_genmet_lorentzvector)
+    m_genmet_lorentzvector->Clear();
 
   if (m_met_puSubstract_lorentzvector)
     m_met_puSubstract_lorentzvector->Clear();

@@ -75,6 +75,7 @@ class multijetExtractorAnalysis: public patextractor::Plugin {
     TClonesArray* m_leadingjetgen_lorentzvector;
     TClonesArray* m_leadingjetraw_lorentzvector;
     TClonesArray* m_recoil_lorentzvector;
+    TClonesArray* m_genrecoil_lorentzvector;
     TClonesArray* m_pu_lorentzvector;
     TClonesArray* m_jets_recoil_lorentzvector;
     TClonesArray* m_jets_pu_lorentzvector;
@@ -96,6 +97,7 @@ class multijetExtractorAnalysis: public patextractor::Plugin {
 		
 		//float m_met;
 		TClonesArray* m_met_lorentzvector;
+		TClonesArray* m_genmet_lorentzvector;
 		TClonesArray* m_met_puSubstract_lorentzvector;
 		float m_secondjetpt;
 		float m_alpha;
