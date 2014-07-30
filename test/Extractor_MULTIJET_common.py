@@ -93,7 +93,13 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
     process.PATextraction.jet_PF.jetCorrectorLabel = "ak5PFchsL1FastL2L3Residual"
 
   process.PATextraction.jet_PF.doJER = True # Disable automatically on data
-  process.PATextraction.jet_PF.doLooseJetID = False 
+  process.PATextraction.jet_PF.doLooseJetID = True 
+  process.PATextraction.jet_PF.useGlobalTagForJEC = True
+  process.PATextraction.jet_PF.jecPayload = "Extractors/PatExtractor/data/jec_payloads.xml"
+  process.PATextraction.jet_PF.useType1Fix = True
+  process.PATextraction.jet_PF.jecPayload_untilL1 = "Extractors/PatExtractor/data/jec_payloads_untilL1.xml"
+  process.PATextraction.jet_PF.jecPayload_untilL3 = "Extractors/PatExtractor/data/jec_payloads_untilL3.xml"
+  process.PATextraction.jet_PF.jecJetAlgo = "AK5PFchs"
 
   # JER systematics:
   # Use -1 for 1-sigma down, 0 for nominal correction, and 1 for 1-sigma up
@@ -113,7 +119,12 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
     multijetExtractorAnalysis = cms.PSet(
       PUJets = cms.PSet(
 	removePUJets = cms.bool(True),
-    id_min = cms.double(6)
+    # ID flag for PU jet identification
+    # 4: jet is not PU with a Loose CL
+    # 6: jet is not PU with a Medium CL 
+    # 7: jet is not PU with a Tight CL
+    # 0: jet is PU (?)
+    id_min = cms.double(7)
 	),
     
       firstJet = cms.PSet(
@@ -121,7 +132,7 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
 	),
 
       recoilJets = cms.PSet(
-	pt_min = cms.double(25.),
+	pt_min = cms.double(10.),
 	eta_max = cms.double(5.0),
 	),
 	
