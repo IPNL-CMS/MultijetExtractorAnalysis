@@ -94,11 +94,10 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
 
   process.PATextraction.jet_PF.doJER = True # Disable automatically on data
   process.PATextraction.jet_PF.doLooseJetID = True 
-  process.PATextraction.jet_PF.useGlobalTagForJEC = True
+  process.PATextraction.jet_PF.useGlobalTagForJEC = False
   process.PATextraction.jet_PF.jecPayload = "Extractors/PatExtractor/data/jec_payloads.xml"
   process.PATextraction.jet_PF.useType1Fix = True
-  process.PATextraction.jet_PF.jecPayload_untilL1 = "Extractors/PatExtractor/data/jec_payloads_untilL1.xml"
-  process.PATextraction.jet_PF.jecPayload_untilL3 = "Extractors/PatExtractor/data/jec_payloads_untilL3.xml"
+  process.PATextraction.jet_PF.jecPayload_L1ForType1Fix = "Extractors/PatExtractor/data/jec_payloads_L1ForType1Fix.xml"
   process.PATextraction.jet_PF.jecJetAlgo = "AK5PFchs"
 
   # JER systematics:
