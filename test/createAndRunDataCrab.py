@@ -4,6 +4,7 @@ import os, copy, datetime, pwd, re
 
 from optparse import OptionParser
 parser = OptionParser()
+parser.add_option("-j", "--process", action="store", dest="cores", type="int", default=1, help="Number of core to use for launching")
 parser.add_option("", "--create-cfg", action="store_true", dest="create_cfg", default=False, help="create config files for crab")
 parser.add_option("", "--run", action="store_true", dest="run", default=False, help="run crab")
 parser.add_option("", "--status", action="store_true", dest="status", default=False, help="run crab -status")
@@ -36,16 +37,14 @@ version = 1
 print("Creating configs for crab. Today is %s, you are %s and it's version %d" % (d, email, version))
 print("")
 
-for dataset in datasets:
+def processDataset(dataset):
   dataset_path = dataset[0]
   dataset_name = dataset[1]  + "_woPU_pt30_eta50_puJetIdT"
   dataset_globaltag = dataset[2]
 
-  ui_working_dir = ("crab_data_%s_%s") % (dataset_name, d)
-  #ui_working_dir = ("crab_data_%s_16Jun") % (dataset_name)
+  ui_working_dir = ("crab_data_%s") % (dataset_name)
   output_file = "crab_data_%s_%s.cfg" % (dataset_name, d)
   output_dir = ("Extracted_step2/data/%s/%s" % (d, dataset_name))
-  #output_dir = ("Extracted_step2/data/16Jun/%s" % (dataset_name))
 
   python_config = "Extractor_MULTIJET_data.py";
 #  if "Electron" in dataset_path:
@@ -85,3 +84,7 @@ for dataset in datasets:
   if options.kill:
     cmd = "crab -kill all -c %s" % (ui_working_dir)
     os.system(cmd) 
+
+import multiprocessing
+pool = multiprocessing.Pool(options.cores)
+pool.map(processDataset, datasets)
