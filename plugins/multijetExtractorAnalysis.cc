@@ -324,84 +324,6 @@ int multijetExtractorAnalysis::isIsolatedMuon(int index)
 	return isIsolated;
 }
 
-int multijetExtractorAnalysis::isLoosePhoton(int index) 
-{
-	int isLoose = 0;
-	if(m_photon->getHadTowOverEm(index) >= 0.05)
-	  return isLoose;
-	  
-	if(m_photon->getSigmaIetaIeta(index) >= 0.0012)
-	  return isLoose;
-	  
-	if(m_photon->hasMatchedPromptElectron(index))
-	  return isLoose;
-	  
-	 if(m_photon->getChargedHadronsIsolation(index) >= 2.6)
-	  return isLoose;
-	  
-	if(m_photon->getNeutralHadronsIsolation(index) >= (3.5 + 0.04 * m_photon->getP4(index)->Pt()))
-	  return isLoose;
-	  
-	if(m_photon->getPhotonIsolation(index) >= (1.3 + 0.005 * m_photon->getP4(index)->Pt()))
-	  return isLoose;
-	  
-	isLoose = 1;
-
-	return isLoose;
-}
-
-int multijetExtractorAnalysis::isMediumPhoton(int index) 
-{
-	int isMedium = 0;
-	if(m_photon->getHadTowOverEm(index) >= 0.05)
-	  return isMedium;
-	  
-	if(m_photon->getSigmaIetaIeta(index) >= 0.0011)
-	  return isMedium;
-	  
-	if(m_photon->hasMatchedPromptElectron(index))
-	  return isMedium;
-	  
-	 if(m_photon->getChargedHadronsIsolation(index) >= 1.5)
-	  return isMedium;
-	  
-	if(m_photon->getNeutralHadronsIsolation(index) >= (1.0 + 0.04 * m_photon->getP4(index)->Pt()))
-	  return isMedium;
-	  
-	if(m_photon->getPhotonIsolation(index) >= (0.7 + 0.005 * m_photon->getP4(index)->Pt()))
-	  return isMedium;
-	  
-	 isMedium = 1;
-
-	return isMedium;
-}
-
-int multijetExtractorAnalysis::isTightPhoton(int index) 
-{
-	int isTight = 0;
-	if(m_photon->getHadTowOverEm(index) >= 0.05)
-	  return isTight;
-	  
-	if(m_photon->getSigmaIetaIeta(index) >= 0.0011)
-	  return isTight;
-	  
-	if(m_photon->hasMatchedPromptElectron(index))
-	  return isTight;
-	  
-	 if(m_photon->getChargedHadronsIsolation(index) >= 0.7)
-	  return isTight;
-	  
-	if(m_photon->getNeutralHadronsIsolation(index) >= (0.4 + 0.04 * m_photon->getP4(index)->Pt()))
-	  return isTight;
-	  
-	if(m_photon->getPhotonIsolation(index) >= (0.5 + 0.005 * m_photon->getP4(index)->Pt()))
-	  return isTight;
-	  
-	 isTight = 1;
-
-	return isTight;
-}
-
 int multijetExtractorAnalysis::ElectronSel()
 {
 	int n_ele = m_electron->getSize();
@@ -658,9 +580,10 @@ int multijetExtractorAnalysis::VertexSel()
 
 	if (!n_vtx)
 		return 0;
-	else if(m_vertex->getNtracks(0)>=m_VERTEX_Tracks_min)
-		return 1;
-	else return 0;
+	else return 1;
+ /* else if(m_vertex->getNtracks(0)>=m_VERTEX_Tracks_min)*/
+		//return 1;
+	/*else return 0;*/
 }
 
 TLorentzVector multijetExtractorAnalysis::getRecoilLorentzVector()
@@ -810,11 +733,11 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 	
 	//int pass_all_cuts = 0;
   
-	m_muon     = std::static_pointer_cast<MuonExtractor>(extractor.getExtractor("muons"));
-	m_electron = std::static_pointer_cast<ElectronExtractor>(extractor.getExtractor("electrons"));
-	m_jetMet   = std::static_pointer_cast<JetMETExtractor>(extractor.getExtractor("JetMET"));
-	m_photon   = std::static_pointer_cast<PhotonExtractor>(extractor.getExtractor("photons"));
-	m_vertex   = std::static_pointer_cast<VertexExtractor>(extractor.getExtractor("vertex"));
+	m_muon     = std::static_pointer_cast<MuonExtractor>(extractor.getExtractor("muon_PF"));
+	m_electron = std::static_pointer_cast<ElectronExtractor>(extractor.getExtractor("electron_PF"));
+	m_jetMet   = std::static_pointer_cast<JetMETExtractor>(extractor.getExtractor("jetmet"));
+	m_photon   = std::static_pointer_cast<PhotonExtractor>(extractor.getExtractor("photon"));
+	m_vertex   = std::static_pointer_cast<VertexExtractor>(extractor.getExtractor("Vertices"));
 
 	new((*m_met_lorentzvector)[0]) TLorentzVector(*(m_jetMet->getMETLorentzVector(0)));		
 	new((*m_genmet_lorentzvector)[0]) TLorentzVector(*(m_jetMet->getGenMETLorentzVector(0)));		
@@ -883,9 +806,9 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 	if(m_n_photons != 0) {
 	  for(int i=0; i<m_n_photons; i++) {
 	    m_photon_pt[i] = m_photon->getP4(i)->Pt();
-	    m_photon_isLoosePhoton[i] = isLoosePhoton(i);
-	    m_photon_isMediumPhoton[i] = isMediumPhoton(i);	
-	    m_photon_isTightPhoton[i] = isTightPhoton(i);
+	    m_photon_isLoosePhoton[i] = m_photon->passLooseId(i);
+	    m_photon_isMediumPhoton[i] = m_photon->passMediumId(i);	
+	    m_photon_isTightPhoton[i] = m_photon->passTightId(i);
 	  }
 	  m_n_photons_loose = CountPhotonsLoose(m_n_photons);
 	  m_n_photons_medium = CountPhotonsMedium(m_n_photons);

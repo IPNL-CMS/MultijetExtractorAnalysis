@@ -23,21 +23,27 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
   #########################################
 
   process.load('Configuration/StandardSequences/Services_cff')
-  process.load('Configuration/StandardSequences/GeometryIdeal_cff')
-  process.load('Configuration/StandardSequences/MagneticField_38T_cff')
+  #process.load('Configuration/StandardSequences/GeometryIdeal_cff')
+  #process.load('Configuration/StandardSequences/MagneticField_38T_cff')
   process.load('Configuration/StandardSequences/EndOfProcess_cff')
-  process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
+  #process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
+  process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
+  process.load('Configuration.StandardSequences.MagneticField_38T_cff')
+  process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
+  process.load("Configuration.EventContent.EventContent_cff")
   process.load("FWCore.MessageLogger.MessageLogger_cfi")
-  process.load("Extractors.PatExtractor.PAT_extractor_cff")
+  #process.load("Extractors.PatExtractor.PAT_extractor_lyonPatTuples_cff")
+  process.load("Extractors.PatExtractor.PAT_extractor_miniAOD_cff")
 
   process.maxEvents = cms.untracked.PSet(
       input = cms.untracked.int32(10) #
       )
 
   #Global tag and data type choice
-  process.GlobalTag.globaltag = '%s::All' % globalTag
+  #process.GlobalTag.globaltag = '%s::All' % globalTag
+  process.GlobalTag.globaltag = '%s' % globalTag
   process.PATextraction.isMC  = isMC
-  process.PATextraction.doMC  = isMC
+  process.PATextraction.extractors.MC.enable  = isMC
 
   #Input PAT file to extract
   process.source = cms.Source("PoolSource",
@@ -66,58 +72,52 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
   #
   # Here we just extract, and don't perform any analysis
 
-  process.PATextraction.doMuon     = True
-  process.PATextraction.doElectron = True
-  process.PATextraction.doJet      = True
-  process.PATextraction.doPhoton   = True
-
-  process.PATextraction.doMET      = True
-  if useShiftCorrectedMET:
-    process.PATextraction.MET_PF.input = cms.InputTag("patMETsShiftCorrPFlow")
-  else:
-    process.PATextraction.MET_PF.input  = cms.InputTag("patMETsPFlow")
-
-  process.PATextraction.doVertex   = True
-  process.PATextraction.vtx_tag    = cms.InputTag( "goodOfflinePrimaryVertices" )
-  process.PATextraction.doHLT      = True
+  process.PATextraction.extractors.photon.enable = True
+  process.PATextraction.extractors.HLT.enable = True
 
   if not isMC:
-    process.PATextraction.triggersXML = readFile("triggers.xml")
+    process.PATextraction.extractors.HLT.parameters.triggers = readFile("triggers.xml")
 
   # Jets correction : needs a valid global tags, or an external DB where JEC are stored
-  process.PATextraction.jet_PF.redoJetCorrection = True
+  process.PATextraction.extractors.jetmet.parameters.redoJetCorrection = True
 
   if isMC:
-    process.PATextraction.jet_PF.jetCorrectorLabel = "ak5PFchsL1FastL2L3"
+    process.PATextraction.extractors.jetmet.parameters.jetCorrectorLabel = "ak4PFCHSL1FastL2L3"
   else:
-    process.PATextraction.jet_PF.jetCorrectorLabel = "ak5PFchsL1FastL2L3Residual"
+    #process.PATextraction.extractors.jetmet.parameters.jetCorrectorLabel = "ak4PFCHSL1FastL2L3Residual"
+    process.PATextraction.extractors.jetmet.parameters.jetCorrectorLabel = "ak4PFCHSL1FastL2L3"
 
-  process.PATextraction.jet_PF.doJER = True # Disable automatically on data
-  process.PATextraction.jet_PF.doLooseJetID = True 
-  process.PATextraction.jet_PF.useGlobalTagForJEC = False
-  process.PATextraction.jet_PF.jecPayload = "Extractors/PatExtractor/data/jec_payloads.xml"
-  process.PATextraction.jet_PF.useType1Fix = True
-  process.PATextraction.jet_PF.jecPayload_L1ForType1Fix = "Extractors/PatExtractor/data/jec_payloads_L1ForType1Fix.xml"
-  process.PATextraction.jet_PF.jecJetAlgo = "AK5PFchs"
+  process.PATextraction.extractors.jetmet.parameters.doJER = True # Disabled automatically on data
+  process.PATextraction.extractors.jetmet.parameters.doLooseJetID = True
+  process.PATextraction.extractors.jetmet.parameters.useGlobalTagForJEC = False
+  #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads.xml"
+  #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_data.xml"
+  #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_mc.xml"
+  #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_mc_pythia8_bx50.xml"
+  #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_mc_pythia8_bx25.xml"
+  #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_Summer15_50nsV2.xml"
+  #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_Summer15_50nsV3.xml"
+  process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_Summer15_25nsV2.xml"
+  process.PATextraction.extractors.jetmet.parameters.jecJetAlgo = "AK4PFchs"
 
   # JER systematics:
   # Use -1 for 1-sigma down, 0 for nominal correction, and 1 for 1-sigma up
-  process.PATextraction.jet_PF.jerSign = 0
+  process.PATextraction.extractors.jetmet.parameters.jerSign = 0
 
   # JES systematics:
   # Use -1 for 1-sigma down, 0 for nominal correction, and 1 for 1-sigma up
-  process.PATextraction.jet_PF.jesSign = 0
-  process.PATextraction.jet_PF.jes_uncertainties_file = cms.untracked.string("")
+  process.PATextraction.extractors.jetmet.parameters.jesSign = 0
+  process.PATextraction.extractors.jetmet.parameters.jes_uncertainties_file = cms.untracked.string("")
 
-  process.PATextraction.MET_PF.redoMetPhiCorrection   = True
-  process.PATextraction.MET_PF.redoMetTypeICorrection = False # Automatically true if redoJetCorrection is True
+  process.PATextraction.extractors.jetmet.parameters.redoMetPhiCorrection   = True
+  process.PATextraction.extractors.jetmet.parameters.redoMetTypeICorrection = True # Automatically true if redoJetCorrection is True
 
 
   # Multijet analysis configuration
   process.PATextraction.plugins = cms.PSet(
     multijetExtractorAnalysis = cms.PSet(
       PUJets = cms.PSet(
-	removePUJets = cms.bool(True),
+	removePUJets = cms.bool(False),
     # ID flag for PU jet identification
     # 4: jet is not PU with a Loose CL
     # 6: jet is not PU with a Medium CL 
@@ -176,9 +176,49 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
   # Launch the job
   #
   #########################################
+  from PhysicsTools.SelectorUtils.tools.vid_id_tools import *
+  # turn on VID producer, indicate data format  to be
+  # DataFormat.AOD or DataFormat.MiniAOD, as appropriate
 
+  # Set up input/output depending on the format
+  # You can list here either AOD or miniAOD files, but not both types mixed
+  #
+  useAOD = False
 
-  process.p = cms.Path(process.PATextraction)
+  if useAOD == True :
+      dataFormat = DataFormat.AOD
+  else :
+      dataFormat = DataFormat.MiniAOD
+ 
+  switchOnVIDPhotonIdProducer(process, dataFormat)
+ 
+  # define which IDs we want to produce
+  my_id_modules = ['RecoEgamma.PhotonIdentification.Identification.cutBasedPhotonID_PHYS14_PU20bx25_V2_cff']
+
+  # running on pattuple 
+#  process.egmPhotonIDs.physicsObjectSrc = cms.InputTag("slimmedPhotonsPFlow")
+  #process.photonIDValueMapProducer.ebReducedRecHitCollectionMiniAOD = cms.InputTag("reducedEgamma:reducedEBRecHits")
+  #process.photonIDValueMapProducer.eeReducedRecHitCollectionMiniAOD = cms.InputTag("reducedEgamma:reducedEERecHits")
+  #process.photonIDValueMapProducer.esReducedRecHitCollectionMiniAOD = cms.InputTag("reducedEgamma:reducedESRecHits")
+  #process.photonIDValueMapProducer.verticesMiniAOD = cms.InputTag("offlineSlimmedPrimaryVertices")
+  #process.photonIDValueMapProducer.pfCandidatesMiniAOD = cms.InputTag("packedPFCandidatesPFlow")
+  #process.photonIDValueMapProducer.srcMiniAOD = cms.InputTag("slimmedPhotonsPFlow")
+
+  # running on miniAOD
+  process.egmPhotonIDs.physicsObjectSrc = cms.InputTag("slimmedPhotons")
+  process.photonIDValueMapProducer.ebReducedRecHitCollectionMiniAOD = cms.InputTag("reducedEgamma:reducedEBRecHits")
+  process.photonIDValueMapProducer.eeReducedRecHitCollectionMiniAOD = cms.InputTag("reducedEgamma:reducedEERecHits")
+  process.photonIDValueMapProducer.esReducedRecHitCollectionMiniAOD = cms.InputTag("reducedEgamma:reducedESRecHits")
+  process.photonIDValueMapProducer.verticesMiniAOD = cms.InputTag("offlineSlimmedPrimaryVertices")
+  process.photonIDValueMapProducer.pfCandidatesMiniAOD = cms.InputTag("packedPFCandidates")
+  process.photonIDValueMapProducer.srcMiniAOD = cms.InputTag("slimmedPhotons")
+
+  #add them to the VID producer
+  for idmod in my_id_modules:
+      setupAllVIDIdsInModule(process,idmod,setupVIDPhotonSelection)
+  
+  process.p = cms.Path(process.egmPhotonIDs+process.PATextraction)
   process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
+  process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(False), allowUnscheduled = cms.untracked.bool(True))
   return process

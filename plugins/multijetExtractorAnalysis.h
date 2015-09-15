@@ -158,10 +158,6 @@ class multijetExtractorAnalysis: public patextractor::Plugin {
 		int isHighPtMuon(int index);
 		int isIsolatedMuon(int index) ;
 		
-		int isLoosePhoton(int index);
-		int isMediumPhoton(int index);
-		int isTightPhoton(int index);
-		
 		int isGoodIsolatedElectron(int index);
 		
 		int ElectronSel();

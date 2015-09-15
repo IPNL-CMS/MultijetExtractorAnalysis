@@ -18,13 +18,15 @@ if options.run:
   options.create_cfg = True
 
 datasets = [
-["/Jet/apequegn-Jet_Run2012A-22Jan2013_09Apr14-v1-829b2d54640b0ff2d246edb621ac7ffd/USER" , "Jet_Run2012A-22Jan2013", "FT53_V21A_AN6"],
-["/JetHT/apequegn-JetHT_Run2012B-22Jan2013_09Apr14-v1-9f561dc7a7b870f3c507ce92c9c7f820/USER", "JetHT_Run2012B-22Jan2013", "FT53_V21A_AN6"],
-["/JetHT/apequegn-JetHT_Run2012C-22Jan2013_09Apr14-v1-9f561dc7a7b870f3c507ce92c9c7f820/USER", "JetHT_Run2012C-22Jan2013", "FT53_V21A_AN6"],
-["/JetHT/apequegn-JetHT_Run2012D-22Jan2013_09Apr14-v1-9f561dc7a7b870f3c507ce92c9c7f820/USER", "JetHT_Run2012D-22Jan2013", "FT53_V21A_AN6"],
-["/JetMon/apequegn-JetMon_Run2012B-22Jan2013_09Apr14-v1-3ba8c59f861a2218f0d0749eda03cb49/USER", "JetMon_Run2012B-22Jan2013", "FT53_V21A_AN6"],
-["/JetMon/apequegn-JetMon_Run2012C-22Jan2013_09Apr14-v1-3ba8c59f861a2218f0d0749eda03cb49/USER", "JetMon_Run2012C-22Jan2013", "FT53_V21A_AN6"],
-["/JetMon/apequegn-JetMon_Run2012D-22Jan2013_09Apr14-v1-3ba8c59f861a2218f0d0749eda03cb49/USER", "JetMon_Run2012D-22Jan2013", "FT53_V21A_AN6"]
+#["/Jet/apequegn-Jet_Run2012A-22Jan2013_09Apr14-v1-829b2d54640b0ff2d246edb621ac7ffd/USER" , "Jet_Run2012A-22Jan2013", "FT53_V21A_AN6"],
+#["/JetHT/apequegn-JetHT_Run2012B-22Jan2013_09Apr14-v1-9f561dc7a7b870f3c507ce92c9c7f820/USER", "JetHT_Run2012B-22Jan2013", "FT53_V21A_AN6"],
+#["/JetHT/apequegn-JetHT_Run2012C-22Jan2013_09Apr14-v1-9f561dc7a7b870f3c507ce92c9c7f820/USER", "JetHT_Run2012C-22Jan2013", "FT53_V21A_AN6"],
+#["/JetHT/apequegn-JetHT_Run2012D-22Jan2013_09Apr14-v1-9f561dc7a7b870f3c507ce92c9c7f820/USER", "JetHT_Run2012D-22Jan2013", "FT53_V21A_AN6"],
+#["/JetMon/apequegn-JetMon_Run2012B-22Jan2013_09Apr14-v1-3ba8c59f861a2218f0d0749eda03cb49/USER", "JetMon_Run2012B-22Jan2013", "FT53_V21A_AN6"],
+#["/JetMon/apequegn-JetMon_Run2012C-22Jan2013_09Apr14-v1-3ba8c59f861a2218f0d0749eda03cb49/USER", "JetMon_Run2012C-22Jan2013", "FT53_V21A_AN6"],
+#["/JetMon/apequegn-JetMon_Run2012D-22Jan2013_09Apr14-v1-3ba8c59f861a2218f0d0749eda03cb49/USER", "JetMon_Run2012D-22Jan2013", "FT53_V21A_AN6"]
+#["/JetHT/apequegn-JetHT_7_4_X_RunD_25Jun15-v1-339c8c37e62a7df1890df9cb21e1059e/USER", "JetHT_7_4_X_RunD_25Jun15", "PHYS14_25_V2"]
+["/JetHT/Run2015B-PromptReco-v1/MINIAOD", "JetHT_Run2015B-PromptReco_miniAOD", "74X_dataRun2_Prompt_v0"]
     ]
 
 # Get email address
@@ -39,7 +41,8 @@ print("")
 
 def processDataset(dataset):
   dataset_path = dataset[0]
-  dataset_name = dataset[1]  + "_woPU_pt30_eta50_puJetIdT"
+  #dataset_name = dataset[1]  + "_woPU_pt30_eta50_puJetIdT"
+  dataset_name = dataset[1]  + "_woPU_pt30_eta50_notRmPUJets"
   dataset_globaltag = dataset[2]
 
   ui_working_dir = ("crab_data_%s") % (dataset_name)

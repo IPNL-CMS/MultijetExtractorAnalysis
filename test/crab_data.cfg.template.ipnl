@@ -6,8 +6,9 @@ use_server = 0
 [CMSSW]
 
 allow_NonProductionCMSSW = 1
-use_dbs3=1
-dbs_url = phys03
+use_dbs3=0
+#dbs_url = phys03
+dbs_url = global
 datasetpath = @datasetname@
 
 pset = @pset@
