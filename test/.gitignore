@@ -1,9 +1,8 @@
 *.pyc
 *.cfg
-*crab_data*
-*crab_MC*
 *.list
 *.root
+*.log
 */
 !/configs
 crab.history
