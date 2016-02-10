@@ -122,8 +122,8 @@ for dataset in datasets:
 
     if options.submit:
         cmd = "crab submit -c %s" % (output_file)
-        print cmd
-        #os.system(cmd)
+        #print cmd
+        os.system(cmd)
 
     correct_ui_working_dir = "crab_%s" % ui_working_dir
     ui_working_dir_area = (os.path.join("tasks", correct_ui_working_dir)) 
