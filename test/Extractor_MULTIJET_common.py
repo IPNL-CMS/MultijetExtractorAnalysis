@@ -30,7 +30,7 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
   process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
   process.load('Configuration.StandardSequences.MagneticField_38T_cff')
   process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
-  process.load("Configuration.EventContent.EventContent_cff")
+  #process.load("Configuration.EventContent.EventContent_cff")
   process.load("FWCore.MessageLogger.MessageLogger_cfi")
   #process.load("Extractors.PatExtractor.PAT_extractor_lyonPatTuples_cff")
   process.load("Extractors.PatExtractor.PAT_extractor_miniAOD_cff")
@@ -84,7 +84,9 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
   if isMC:
     process.PATextraction.extractors.jetmet.parameters.jetCorrectorLabel = "ak4PFCHSL1FastL2L3"
   else:
+    # For closure:
     #process.PATextraction.extractors.jetmet.parameters.jetCorrectorLabel = "ak4PFCHSL1FastL2L3Residual"
+    # For L3Res extraction:
     process.PATextraction.extractors.jetmet.parameters.jetCorrectorLabel = "ak4PFCHSL1FastL2L3"
 
   process.PATextraction.extractors.jetmet.parameters.doJER = True # Disabled automatically on data
@@ -97,8 +99,24 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
   #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_mc_pythia8_bx25.xml"
   #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_Summer15_50nsV2.xml"
   #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_Summer15_50nsV3.xml"
-  process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_Summer15_25nsV2.xml"
+  #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_Summer15_25nsV2.xml"
+  #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_Summer15_25nsV3.xml"
+
+  # Closure test:
+  #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_Summer15_25nsV5_closure.xml"
+
+  # Other sanity check: only L2Res on data (exclude L3Res)
+  # Summer15_25nsV5L2ONLY_DATA_L2Residual_AK4PFchs.txt in the email is called Summer15_25nsV5_DATA_L2Residual_AK4PFchs.txt here
+  process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_Summer15_25nsV6_L2ResOnlyOnData.xml"
+  #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_Summer15_25nsV5_L2ResOnlyOnData.xml"
   process.PATextraction.extractors.jetmet.parameters.jecJetAlgo = "AK4PFchs"
+  process.PATextraction.extractors.jetmet.parameters.useType1Fix = True
+  #process.PATextraction.extractors.jetmet.parameters.useType1Fix = False
+  process.PATextraction.extractors.jetmet.parameters.useGlobalTagForType1Fix = True
+  #process.PATextraction.extractors.jetmet.parameters.useGlobalTagForType1Fix = False
+  process.PATextraction.extractors.jetmet.parameters.jetCorrectorLabelForType1Fix = "ak4PFCHSL1RC"
+  process.PATextraction.extractors.jetmet.parameters.jecPayload_L1ForType1Fix = "Extractors/PatExtractor/data/jec_payloads_L1ForType1Fix_Summer15_25nsV6.xml"
+  #process.PATextraction.extractors.jetmet.parameters.jecPayload_L1ForType1Fix = "Extractors/PatExtractor/data/jec_payloads_L1ForType1Fix_Summer15_25nsV5.xml"
 
   # JER systematics:
   # Use -1 for 1-sigma down, 0 for nominal correction, and 1 for 1-sigma up
