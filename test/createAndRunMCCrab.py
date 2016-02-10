@@ -68,6 +68,15 @@ datasets = [
 #    ["/QCD_Pt-15to7000_TuneCUETP8M1_Flat_13TeV_pythia8/apequegn-QCD_Pt-15to7000_Flat_13TeV_50ns_pythia8_25Jun15-v1-949f4a919651fc0956a5c1f2e3affdf2/USER", "QCD_Pt-15to7000_TuneCUETP8M1_Flat_13TeV_50ns_pythia8"],
     #["/QCD_Pt-15TTo7000_TuneZ2star-Flat_13TeV_pythia6/apequegn-QCD_Pt-15TTo7000_TuneZ2star-Flat_13TeV_pythia6_25Jun15-v1-949f4a919651fc0956a5c1f2e3affdf2/USER", "QCD_Pt-15TTo7000_TuneZ2star-Flat_13TeV_pythia6"],
     #["/QCD_Pt-15to7000_TuneCUETP8M1_Flat_13TeV_pythia8/apequegn-QCD_Pt-15to7000_Flat_13TeV_25ns_pythia8_25Jun15-v1-949f4a919651fc0956a5c1f2e3affdf2/USER", "QCD_Pt-15to7000_TuneCUETP8M1_Flat_13TeV_25ns_pythia8"],
+
+    ["/QCD_HT100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/MINIAODSIM", "QCD_HT100to200"],
+    ["/QCD_HT200to300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/MINIAODSIM", "QCD_HT200to300"],
+    ["/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/MINIAODSIM", "QCD_HT300to500"],
+    ["/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/MINIAODSIM", "QCD_HT500to700"],
+    ["/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/MINIAODSIM", "QCD_HT700to1000"],
+    ["/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/MINIAODSIM", "QCD_HT1000to1500"],
+    ["/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/MINIAODSIM", "QCD_HT1500to2000"],
+    ["/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/RunIISpring15MiniAODv2-74X_mcRun2_asymptotic_v2-v1/MINIAODSIM", "QCD_HT2000toInf"],
     
     ]
 
