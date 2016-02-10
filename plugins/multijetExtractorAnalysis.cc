@@ -127,7 +127,7 @@ multijetExtractorAnalysis::multijetExtractorAnalysis(const edm::ParameterSet& cm
   m_VERTEX_Tracks_min = cmsswSettings.getParameter<edm::ParameterSet>("vertex").getParameter<double>("tracks_min");
   
   //SecondJetSel()	
-  m_JET2_Pt_max = cmsswSettings.getParameter<edm::ParameterSet>("secondJet").getParameter<double>("pt_max");
+  //m_JET2_Pt_max = cmsswSettings.getParameter<edm::ParameterSet>("secondJet").getParameter<double>("pt_max");
   m_JET2_A_max = cmsswSettings.getParameter<edm::ParameterSet>("secondJet").getParameter<double>("a_max");
 	
   //AlphaSel()		
@@ -621,7 +621,8 @@ int multijetExtractorAnalysis::SecondJetSel(TLorentzVector recoil)
 		float ptRecoil = recoil.Pt();
 		float secondjetpt = m_jetMet->getP4(m_goodJetsIndex.at(1))->Pt();
 		float A = fabs(secondjetpt)/fabs(ptRecoil);
-		if(secondjetpt<m_JET2_Pt_max && A < m_JET2_A_max)
+		//if(secondjetpt<m_JET2_Pt_max && A < m_JET2_A_max)
+		if(A < m_JET2_A_max)
 			isOK = 1;
 	}
 	return isOK;
