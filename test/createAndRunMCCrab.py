@@ -92,8 +92,8 @@ for dataset in datasets:
     #dataset_globaltag = re.search('START\d{0,2}_V\d[A-Z]?', dataset_path).group(0)
 
     #publish_name = "%s_%s_%s-v%d" % (dataset_name, dataset_globaltag, d, version)
-    output_file = (os.path.join("tasks","crab_MC_%s.py" % (dataset_name)))
-    ui_working_dir = ("crab_MC_%s") % (dataset_name)
+    output_file = (os.path.join("tasks","crab_MC_%s_%s.py" % (dataset_name, d)))
+    ui_working_dir = ("crab_MC_%s_%s") % (dataset_name, d)
 
     try:
         getUsernameFromSiteDB()
