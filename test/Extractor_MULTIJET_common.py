@@ -141,7 +141,7 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
 	),
 	
       secondJet = cms.PSet(
-	pt_max = cms.double(750),
+	#pt_max = cms.double(750), # remove this cut for 13 TeV analysis
 	a_max = cms.double(0.6)
 	),
 	
