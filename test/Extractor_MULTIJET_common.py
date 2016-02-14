@@ -91,32 +91,19 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
 
   process.PATextraction.extractors.jetmet.parameters.doJER = True # Disabled automatically on data
   process.PATextraction.extractors.jetmet.parameters.doLooseJetID = True
+  #process.PATextraction.extractors.jetmet.parameters.useGlobalTagForJEC = True
   process.PATextraction.extractors.jetmet.parameters.useGlobalTagForJEC = False
-  #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads.xml"
-  #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_data.xml"
-  #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_mc.xml"
-  #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_mc_pythia8_bx50.xml"
-  #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_mc_pythia8_bx25.xml"
-  #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_Summer15_50nsV2.xml"
-  #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_Summer15_50nsV3.xml"
-  #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_Summer15_25nsV2.xml"
-  #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_Summer15_25nsV3.xml"
 
-  # Closure test:
-  #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_Summer15_25nsV5_closure.xml"
-
-  # Other sanity check: only L2Res on data (exclude L3Res)
-  # Summer15_25nsV5L2ONLY_DATA_L2Residual_AK4PFchs.txt in the email is called Summer15_25nsV5_DATA_L2Residual_AK4PFchs.txt here
-  process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_Summer15_25nsV6_L2ResOnlyOnData.xml"
-  #process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_74X_Summer15_25nsV5_L2ResOnlyOnData.xml"
+  # only L2Res on data (exclude L3Res)
+  # Fall15_25nsV1_DATA_L2Residual_AK4PFchs.txt is a coy of Fall15_25ns_COMB_LOGLIN_L2Residual_v2_AK4PFchs_nokFSR.txt Fall15_25nsV1_DATA_L2Residual_AK4PFchs.txt
+  process.PATextraction.extractors.jetmet.parameters.jecPayload = "Extractors/PatExtractor/data/jec_payloads_76X_Fall15_25nsV1_L2ResOnlyOnData.xml"
   process.PATextraction.extractors.jetmet.parameters.jecJetAlgo = "AK4PFchs"
   process.PATextraction.extractors.jetmet.parameters.useType1Fix = True
   #process.PATextraction.extractors.jetmet.parameters.useType1Fix = False
-  process.PATextraction.extractors.jetmet.parameters.useGlobalTagForType1Fix = True
-  #process.PATextraction.extractors.jetmet.parameters.useGlobalTagForType1Fix = False
+  #process.PATextraction.extractors.jetmet.parameters.useGlobalTagForType1Fix = True
+  process.PATextraction.extractors.jetmet.parameters.useGlobalTagForType1Fix = False
   process.PATextraction.extractors.jetmet.parameters.jetCorrectorLabelForType1Fix = "ak4PFCHSL1RC"
-  process.PATextraction.extractors.jetmet.parameters.jecPayload_L1ForType1Fix = "Extractors/PatExtractor/data/jec_payloads_L1ForType1Fix_Summer15_25nsV6.xml"
-  #process.PATextraction.extractors.jetmet.parameters.jecPayload_L1ForType1Fix = "Extractors/PatExtractor/data/jec_payloads_L1ForType1Fix_Summer15_25nsV5.xml"
+  process.PATextraction.extractors.jetmet.parameters.jecPayload_L1ForType1Fix = "Extractors/PatExtractor/data/jec_payloads_L1ForType1Fix_Fall15_25nsV1.xml"
 
   # JER systematics:
   # Use -1 for 1-sigma down, 0 for nominal correction, and 1 for 1-sigma up
@@ -186,7 +173,7 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
   switchOnVIDPhotonIdProducer(process, dataFormat)
  
   # define which IDs we want to produce
-  my_id_modules = ['RecoEgamma.PhotonIdentification.Identification.cutBasedPhotonID_PHYS14_PU20bx25_V2_cff']
+  my_id_modules = ['RecoEgamma.PhotonIdentification.Identification.cutBasedPhotonID_Spring15_25ns_V1_cff']
 
   # running on pattuple 
 #  process.egmPhotonIDs.physicsObjectSrc = cms.InputTag("slimmedPhotonsPFlow")
