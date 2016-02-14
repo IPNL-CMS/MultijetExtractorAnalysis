@@ -121,14 +121,7 @@ class multijetExtractorAnalysis: public patextractor::Plugin {
 		float m_JET2_Pt_max;
 		float m_JET2_A_max;
 		
-		float m_ALPHA_max;
-		float m_BETA_min;
-		
-		float m_ELE_Iso_max;
-		
 		float m_MU_Iso_max;
-		
-		float m_PHOT_Iso_max;
 		
 		static const int 	m_jets_MAX       = 200;
 		int 	m_jet_isPFJetLoose[m_jets_MAX];
@@ -146,10 +139,6 @@ class multijetExtractorAnalysis: public patextractor::Plugin {
 		int 	m_photon_isLoosePhoton[m_photons_MAX];
 		int 	m_photon_isMediumPhoton[m_photons_MAX];
 		int 	m_photon_isTightPhoton[m_photons_MAX];
-		
-// 		static const int 	m_electrons_MAX       = 200;
-// 		int 	m_electron_isGoodElectron[m_electrons_MAX];
-// 		int 	m_electron_isIsolatedElectron[m_electrons_MAX];
 		  
 		  //Selections
 		int isLooseMuon(int index);
@@ -158,30 +147,22 @@ class multijetExtractorAnalysis: public patextractor::Plugin {
 		int isHighPtMuon(int index);
 		int isIsolatedMuon(int index) ;
 		
-		int isGoodIsolatedElectron(int index);
-		
 		int ElectronSel();
+		int MuonSel();
+		int PhotonSel();
 		int JetSel1();
 		int JetSel2();
-		int RecoilSel(TLorentzVector recoil_p4);
-		int FirstJetSel();
 		int VertexSel();
-		int SecondJetSel(TLorentzVector recoil);
-		int AlphaSel(TLorentzVector recoil);
-		int BetaSel();
 		  
 		int m_multijet_isSel;
 		  
 		// Cut ; -1 event drop before arriving to this cut ; 0 cut failed, 1 cut passed
 		int m_pass_electron_cut;
+		int m_pass_photon_cut;
+		int m_pass_muon_cut;
 		int m_pass_vertex_cut;
-		int m_pass_recoil_cut;
 		int m_pass_Jet_cut1;
 		int m_pass_Jet_cut2;
-		int m_pass_1stJet_cut;
-		int m_pass_2ndJet_cut;
-		int m_pass_alpha_cut;
-		int m_pass_beta_cut;
 };
 
 #endif 

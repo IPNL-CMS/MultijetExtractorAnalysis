@@ -82,11 +82,6 @@ multijetExtractorAnalysis::multijetExtractorAnalysis(const edm::ParameterSet& cm
   m_tree_Multijet->Branch("pass_vertex_cut", &m_pass_vertex_cut, "pass_vertex_cut/I");
   m_tree_Multijet->Branch("pass_Jet_cut1", &m_pass_Jet_cut1, "pass_Jet_cut1/I");
   m_tree_Multijet->Branch("pass_Jet_cut2", &m_pass_Jet_cut2, "pass_Jet_cut2/I");
-  m_tree_Multijet->Branch("pass_recoil_cut", &m_pass_recoil_cut, "pass_recoil_cut/I");
-  m_tree_Multijet->Branch("pass_1stJet_cut", &m_pass_1stJet_cut, "pass_1stJet_cut/I");
-  m_tree_Multijet->Branch("pass_2ndJet_cut", &m_pass_2ndJet_cut, "pass_2ndJet_cut/I");
-  m_tree_Multijet->Branch("pass_alpha_cut", &m_pass_alpha_cut, "pass_alpha_cut/I");
-  m_tree_Multijet->Branch("pass_beta_cut", &m_pass_beta_cut, "pass_beta_cut/I");
   
   m_tree_Multijet->Branch("MJB"         , &m_MJB             , "MJB/F");
   
@@ -115,9 +110,6 @@ multijetExtractorAnalysis::multijetExtractorAnalysis(const edm::ParameterSet& cm
   m_removePUJets = cmsswSettings.getParameter<edm::ParameterSet>("PUJets").getParameter<bool>("removePUJets");  
   m_PUJets_Id_min = cmsswSettings.getParameter<edm::ParameterSet>("PUJets").getParameter<double>("id_min");
  
-  //FirstJetSel(); 
-  m_JET1_Eta_max = cmsswSettings.getParameter<edm::ParameterSet>("firstJet").getParameter<double>("eta_max");
-  
   //Recoil jets	
   m_RECOILJETS_Pt_min = cmsswSettings.getParameter<edm::ParameterSet>("recoilJets").getParameter<double>("pt_min");
   m_RECOILJETS_Eta_max = cmsswSettings.getParameter<edm::ParameterSet>("recoilJets").getParameter<double>("eta_max");
@@ -125,25 +117,10 @@ multijetExtractorAnalysis::multijetExtractorAnalysis(const edm::ParameterSet& cm
   //VertexSel()	
   //m_VERTEX_Number_min = cmsswSettings.getParameter<edm::ParameterSet>("vertex").getParameter<double>("number_min");
   m_VERTEX_Tracks_min = cmsswSettings.getParameter<edm::ParameterSet>("vertex").getParameter<double>("tracks_min");
-  
-  //SecondJetSel()	
-  //m_JET2_Pt_max = cmsswSettings.getParameter<edm::ParameterSet>("secondJet").getParameter<double>("pt_max");
-  m_JET2_A_max = cmsswSettings.getParameter<edm::ParameterSet>("secondJet").getParameter<double>("a_max");
-	
-  //AlphaSel()		
-  m_ALPHA_max = cmsswSettings.getParameter<edm::ParameterSet>("alpha").getParameter<double>("alpha_max");
-  
-  //BetaSel()
-  m_BETA_min = cmsswSettings.getParameter<edm::ParameterSet>("beta").getParameter<double>("beta_min");
- 
-  //ElectronSel 
-  m_ELE_Iso_max = cmsswSettings.getParameter<edm::ParameterSet>("electrons").getParameter<double>("isolation_max");
-		
+
   //MuonSel()
   m_MU_Iso_max = cmsswSettings.getParameter<edm::ParameterSet>("muons").getParameter<double>("isolation_max");
 
-  //PhotonSel()		
-  m_PHOT_Iso_max = cmsswSettings.getParameter<edm::ParameterSet>("photons").getParameter<double>("isolation_max");
 }
 
 
@@ -197,26 +174,6 @@ float multijetExtractorAnalysis::computeHT()
 	return HT;
 }
 
-int multijetExtractorAnalysis::isGoodIsolatedElectron(int index) 
-{
-	int isGood = 0;
-	TLorentzVector *eP = m_electron->getEleLorentzVector(index);
-	if(fabs(eP->Pt()) <= 20)
-		return isGood;
-		
-	if (fabs(eP->Eta()) >= 2.5)
-		return isGood;
-		
-	if (m_electron->getEleeidMVATrigV0(index) <= 0 ||
-	m_electron->getEleeidMVATrigV0(index) >= 1)
-		return isGood;	
-		
-	if (m_electron->getRhoCorrectedRelativeIsolation(index) >= m_ELE_Iso_max)
-		return isGood;
-		
-	isGood = 1;
-	return isGood;
-}
 
 int multijetExtractorAnalysis::getN_PFJets() 
 {
@@ -240,6 +197,8 @@ int multijetExtractorAnalysis::getN_PFJets()
 int multijetExtractorAnalysis::isLooseMuon(int index) 
 {
 	int isLoose = 0;
+  // see https://twiki.cern.ch/twiki/bin/view/CMS/SWGuideMuonIdRun2#Loose_Muon
+  // function isLooseMuon if isPFMuon and (isGlobalMuon or isTrackerMuon)
 	if(m_muon->getMuisGlobal(index) == 1 || m_muon->getMuisTracker(index))
 	{
 		isLoose = 1;
@@ -324,53 +283,70 @@ int multijetExtractorAnalysis::isIsolatedMuon(int index)
 	return isIsolated;
 }
 
-int multijetExtractorAnalysis::ElectronSel()
+int multijetExtractorAnalysis::ElectronSel() // no isolated electron (with loose ID)
 {
 	int n_ele = m_electron->getSize();
 	int pass_ele_sel = 0;
 
-	if (!n_ele)
-		pass_ele_sel = 1;
-		
-	int IsGoodIsolated = 0;
-	int n_isol_ele = 0;
+  if (!n_ele)
+    pass_ele_sel = 1;
+ 
+  int n_isol_ele = 0;
 
-	for (int i = 0; i < n_ele; i++)
-	{
-		IsGoodIsolated = isGoodIsolatedElectron(i) ;
-		if(IsGoodIsolated == 1) 
-			n_isol_ele = n_isol_ele + 1;
-	}
-	if(n_isol_ele == 0) pass_ele_sel = 1;
-	else if(n_isol_ele >= 1) pass_ele_sel = 0;
+  for (int i = 0; i < n_ele; i++)	{
+    if (m_electron->passLooseId(i)) { // in runII, a loose electron is an isolated electron: https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedElectronIdentificationRun2
+      n_isol_ele = n_isol_ele + 1;
+    }
+  }
+
+  if(n_isol_ele == 0) pass_ele_sel = 1;
+  else if(n_isol_ele >= 1) pass_ele_sel = 0;
 	return pass_ele_sel;
 }
 
-int multijetExtractorAnalysis::RecoilSel(TLorentzVector recoil_p4)
+int multijetExtractorAnalysis::MuonSel() // no isolated muon (with loose ID)
 {
-  //not done anymore
-	int n_jet = m_goodJetsIndex.size();
-	
-	if (! n_jet)
-		return 0;
+	int n_muon = m_muon->getSize();
+	int pass_muon_sel = 0;
 
-	if(recoil_p4.Pt() <= 210.)
-		return 0;
+	if (!n_muon)
+		pass_muon_sel = 1;
 	
-	return 1;
+	int n_isol_muon = 0;
+
+	for (int i = 0; i < n_muon; i++) {
+	  if (isIsolatedMuon(i) && m_muon->isLooseMuon(i)) {
+			n_isol_muon = n_isol_muon + 1;
+    }
+	}
+
+	if(n_isol_muon == 0) pass_muon_sel = 1;
+	else if(n_isol_muon >= 1) pass_muon_sel = 0;
+	return pass_muon_sel;
 }
 
-int multijetExtractorAnalysis::FirstJetSel()
+int multijetExtractorAnalysis::PhotonSel()  // no isolated photon (with loose ID)
 {
-  //done after Extractor
-	if (! m_goodJetsIndex.size())
-		return 0;
+	int n_pho = m_photon->getSize();
+	int pass_pho_sel = 0;
 
-	if(fabs(m_jetMet->getP4(m_goodJetsIndex.at(0))->Eta()) >= m_JET1_Eta_max)
-		return 0;
-	
-	return 1;
+	if (!n_pho)
+		pass_pho_sel = 1;
+
+  int n_isol_pho = 0;
+
+	for (int i = 0; i < n_pho; i++)	{
+	  if (m_photon->passLooseId(i)) { // in runII, a loose photon is an isolated photon: https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedPhotonIdentificationRun2
+			n_isol_pho = n_isol_pho + 1;
+	  }
+  }
+
+	if(n_isol_pho == 0) pass_pho_sel = 1;
+	else if(n_isol_pho >= 1) pass_pho_sel = 0;
+	return pass_pho_sel;
 }
+
+
 
 int multijetExtractorAnalysis::JetSel1()
 {
@@ -610,24 +586,6 @@ TLorentzVector multijetExtractorAnalysis::getRecoilLorentzVector()
 
 
 
-
-int multijetExtractorAnalysis::SecondJetSel(TLorentzVector recoil)
-{
-  //done after Extractor
-	int isOK = 0;
-	int n_jet = m_goodJetsIndex.size();
-		
-	if(n_jet != 0) {
-		float ptRecoil = recoil.Pt();
-		float secondjetpt = m_jetMet->getP4(m_goodJetsIndex.at(1))->Pt();
-		float A = fabs(secondjetpt)/fabs(ptRecoil);
-		//if(secondjetpt<m_JET2_Pt_max && A < m_JET2_A_max)
-		if(A < m_JET2_A_max)
-			isOK = 1;
-	}
-	return isOK;
-}
-
 float multijetExtractorAnalysis::computeAlpha(TLorentzVector recoil)
 {
 	float phiRecoil = recoil.Phi();
@@ -639,21 +597,6 @@ float multijetExtractorAnalysis::computeAlpha(TLorentzVector recoil)
 	return alpha;
 }
 
-int multijetExtractorAnalysis::AlphaSel(TLorentzVector recoil)
-{
-  //done after Extractor
-	int isOK = 0;
-	int n_jet = m_goodJetsIndex.size();
-		
-	if (n_jet != 0) {
-		float alpha =  computeAlpha(recoil);
-		
-		if(alpha < m_ALPHA_max) {
-			isOK = 1;
-		}
-	}
-	return isOK;
-}
 
 float multijetExtractorAnalysis::computeBeta(int n_jet)
 {
@@ -681,24 +624,6 @@ float multijetExtractorAnalysis::computeBeta(int n_jet)
 	return beta;
 }
 
-int multijetExtractorAnalysis::BetaSel()
-{
-  //done after Extractor
-	int isOK = 0;
-	int n_jet = m_goodJetsIndex.size();
-
-	//if(n_jet != 0) {
-	if(n_jet > 1) {//we need at least 2 jets to compute a deltaPhi
-
-		float minDeltaPhi = computeBeta(n_jet);
-	
-
-		if(minDeltaPhi>m_BETA_min) {
-			isOK = 1;		
-		}
-	}
-	return isOK;
-}
 
 float multijetExtractorAnalysis::GetMJB(float ptLeading, float ptRecoil)
 {
@@ -792,9 +717,9 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 	
 	if(m_n_muons != 0) {
 	  for(int i=0; i<m_n_muons; i++) {
-	    m_muon_isLooseMuon[i] = isLooseMuon(i);
-	    m_muon_isSoftMuon[i] = isSoftMuon(i);	
-	    m_muon_isTightMuon[i] = isTightMuon(i);
+	    m_muon_isLooseMuon[i] = m_muon->isLooseMuon(i);
+	    m_muon_isSoftMuon[i] = m_muon->isSoftMuon(i);
+	    m_muon_isTightMuon[i] = m_muon->isTightMuon(i);
 	    m_muon_isHighPtMuon[i] = isHighPtMuon(i);
 	    m_muon_isIsolatedMuon[i] = isIsolatedMuon(i);
 	  }
@@ -807,7 +732,7 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 	if(m_n_photons != 0) {
 	  for(int i=0; i<m_n_photons; i++) {
 	    m_photon_pt[i] = m_photon->getP4(i)->Pt();
-	    m_photon_isLoosePhoton[i] = m_photon->passLooseId(i);
+	    m_photon_isLoosePhoton[i] = m_photon->passLooseId(i); // in runII, a loose photon is an isolated photon: https://twiki.cern.ch/twiki/bin/view/CMS/CutBasedPhotonIdentificationRun2
 	    m_photon_isMediumPhoton[i] = m_photon->passMediumId(i);	
 	    m_photon_isTightPhoton[i] = m_photon->passTightId(i);
 	  }
@@ -858,6 +783,12 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 	int res = ElectronSel();
 	CHECK_RES_AND_RETURN(res, m_pass_electron_cut);
 
+	res = MuonSel();
+	CHECK_RES_AND_RETURN(res, m_pass_muon_cut);
+
+	res = PhotonSel();
+	CHECK_RES_AND_RETURN(res, m_pass_photon_cut);
+
 	res = VertexSel();
 	CHECK_RES_AND_RETURN(res, m_pass_vertex_cut);
 
@@ -866,24 +797,6 @@ void multijetExtractorAnalysis::analyze(const edm::EventSetup& iSetup, PatExtrac
 	
 	res = JetSel2();
 	CHECK_RES_AND_RETURN(res, m_pass_Jet_cut2);	
-	
-  //not done anymore
-	//res = RecoilSel(recoil);
-	//CHECK_RES_AND_RETURN(res, m_pass_recoil_cut);
-
-  //selections done after Extractor
-	//res = FirstJetSel();
-	//CHECK_RES_AND_RETURN(res, m_pass_1stJet_cut);
-	
-	//res = SecondJetSel(recoil);
-	//CHECK_RES_AND_RETURN(res, m_pass_2ndJet_cut);
-
-	//res = AlphaSel(recoil);
-	//CHECK_RES_AND_RETURN(res, m_pass_alpha_cut);
-
-	//res = BetaSel();
-	//CHECK_RES_AND_RETURN(res, m_pass_beta_cut);
-
 
 	m_multijet_isSel = 1;	
 
@@ -940,11 +853,7 @@ void multijetExtractorAnalysis::reset()
   m_alpha = -1;
   m_beta = -1;
 		
-//   for (int i=0;i<m_electrons_MAX;++i) 
-//   {
-//     m_electron_isGoodElectron[i]     = -1;
-//     m_electron_isIsolatedElectron[i] = -1;
-//   }
+
   for(int i=0; i<m_jets_MAX; i++) {
 	m_jet_isPFJetLoose[i] =  -1;
 	m_jet_puJetId[i]      =  -1;
@@ -955,12 +864,7 @@ void multijetExtractorAnalysis::reset()
   m_pass_electron_cut	         = -1; 
   m_pass_Jet_cut1         	 = -1;
   m_pass_Jet_cut2         	 = -1;
-  m_pass_recoil_cut      	 = -1;
-  m_pass_1stJet_cut      	 = -1;
-  m_pass_2ndJet_cut      	 = -1;
   m_pass_vertex_cut      	 = -1;
-  m_pass_alpha_cut       	 = -1;
-  m_pass_beta_cut        	 = -1;
  
   m_multijet_isSel       	 = -1;
   

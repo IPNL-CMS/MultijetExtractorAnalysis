@@ -143,44 +143,19 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
     # 0: jet is PU (?)
     id_min = cms.double(7)
 	),
-    
-      firstJet = cms.PSet(
-	eta_max = cms.double(1.3)
-	),
 
       recoilJets = cms.PSet(
-	pt_min = cms.double(10.),
-	eta_max = cms.double(5.0),
+	pt_min = cms.double(30.),
+	eta_max = cms.double(3.0),
 	),
 	
       vertex = cms.PSet(
 	#number_min = cms.double(1),
 	tracks_min = cms.double(5)
 	),
-	
-      secondJet = cms.PSet(
-	#pt_max = cms.double(750), # remove this cut for 13 TeV analysis
-	a_max = cms.double(0.6)
-	),
-	
-      alpha = cms.PSet(
-	alpha_max = cms.double(0.3)
-	),
-	
-      beta = cms.PSet(
-	beta_min = cms.double(1)
-	),
-	
-      muons = cms.PSet(
-	isolation_max = cms.double(0.20)
-	),
-	
-      electrons = cms.PSet(
-	isolation_max = cms.double(0.15)
-	),
-	
-      photons = cms.PSet(
-	isolation_max = cms.double(0.15)
+
+      muons = cms.PSet( # see https://twiki.cern.ch/twiki/bin/viewauth/CMS/MuonIsolationForRun2
+	isolation_max = cms.double(0.40)
 	)
 	
       ) 
