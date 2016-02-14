@@ -197,7 +197,17 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
   for idmod in my_id_modules:
       setupAllVIDIdsInModule(process,idmod,setupVIDPhotonSelection)
   
-  process.p = cms.Path(process.egmPhotonIDs+process.PATextraction)
+
+  switchOnVIDElectronIdProducer(process, dataFormat)
+
+  id_modules = [
+          'RecoEgamma.ElectronIdentification.Identification.cutBasedElectronID_Spring15_25ns_V1_cff'
+          ]
+
+  for mod in id_modules:
+      setupAllVIDIdsInModule(process, mod, setupVIDElectronSelection)
+
+  process.p = cms.Path(process.egmPhotonIDs+process.egmGsfElectronIDSequence+process.PATextraction)
   process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
   process.options = cms.untracked.PSet( wantSummary = cms.untracked.bool(False), allowUnscheduled = cms.untracked.bool(True))
